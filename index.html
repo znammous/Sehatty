@@ -490,7 +490,7 @@ body.landing{padding-bottom:24px!important}
 .phone{position:relative;width:100%;max-width:250px;aspect-ratio:390/760;border-radius:34px;border:9px solid #3b2238;background:var(--sky2);overflow:hidden;box-shadow:0 22px 40px rgba(90,40,80,.22),inset 0 0 0 2px rgba(255,255,255,.12)}
 .phone::before{content:"";position:absolute;top:7px;left:50%;transform:translateX(-50%);width:34%;height:15px;border-radius:999px;background:#3b2238;z-index:2}
 .phone img{display:block;width:100%;height:100%;object-fit:cover;object-position:top}
-.lshot:nth-child(even) .phone{transform:translateY(22px)}
+.lshot:nth-child(even){margin-top:28px}
 .lfeat{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
 .lcard{background:var(--surface);border:3px solid #fff;border-radius:26px;padding:20px;box-shadow:0 10px 24px rgba(90,40,80,.08);display:flex;flex-direction:column;gap:8px}
 .lcard .lic{width:54px;height:54px;border-radius:18px;background:var(--accent-soft);display:flex;align-items:center;justify-content:center;font-size:28px}
@@ -499,7 +499,7 @@ body.landing{padding-bottom:24px!important}
 .lkids{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:28px;align-items:center;background:linear-gradient(160deg,#fff 0%,var(--surface) 60%,var(--accent-soft) 100%);border:3px solid #fff;border-radius:36px;padding:32px;box-shadow:0 14px 34px rgba(90,40,80,.1)}
 .lkids .phones{display:flex;justify-content:center;gap:14px}
 .lkids .phone{max-width:210px}
-.lkids .phone+.phone{transform:translateY(30px)}
+.lkids .phone+.phone{margin-top:30px}
 .lkids-txt{display:flex;flex-direction:column;gap:14px}
 .lkids-txt h2{font-size:clamp(25px,4.6vw,34px)}
 .lkids-txt>p{font-size:17px;line-height:1.8}
@@ -531,7 +531,7 @@ body.landing{padding-bottom:24px!important}
   .lshow{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:16px;padding:6px 16px 34px;margin-inline:-16px;scrollbar-width:none}
   .lshow::-webkit-scrollbar{display:none}
   .lshot{flex:0 0 68%;scroll-snap-align:center}
-  .lshot:nth-child(even) .phone{transform:none}
+  .lshot:nth-child(even){margin-top:0}
   .lfeat,.lfam{grid-template-columns:repeat(2,minmax(0,1fr))}
   .lkids{grid-template-columns:1fr;padding:24px 18px}
   .lsafe{grid-template-columns:repeat(2,minmax(0,1fr))}

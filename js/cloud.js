@@ -86,7 +86,14 @@ const Cloud = (() => {
       parent = !!(g && g.exists());
       guardName = parent ? (g.data().name || '') : '';
     } else parent = true;
-    if (!parent) { set('kid'); return; }
+    if (!parent) {
+      set('kid');
+      // جهاز طفل: يقرأ موعد الولادة فقط من apps/sehattyKids
+      extraUnsubs.push(fb.fs.onSnapshot(famDoc('apps', 'sehattyKids'), snap => {
+        notify('kids', snap.exists() ? snap.data() : null);
+      }, () => notify('kids', null)));
+      return;
+    }
     dataUnsub = fb.fs.onSnapshot(famDoc('sehatty', 'main'), { includeMetadataChanges: true }, snap => {
       status = snap.metadata.fromCache ? 'offline' : 'ok';
       notify('status');
@@ -107,6 +114,9 @@ const Cloud = (() => {
     extraUnsubs.push(fs.onSnapshot(fs.query(famCol('sehattyLog'), fs.orderBy('t', 'desc'), fs.limit(60)), snap => {
       notify('log', snap.docs.map(d => ({ id: d.id, ...d.data() })));
     }, () => {}));
+    extraUnsubs.push(fs.onSnapshot(fs.query(famCol('apps', 'sehattyKids', 'hearts'), fs.orderBy('t', 'desc'), fs.limit(30)), snap => {
+      notify('hearts', snap.docs.map(d => ({ id: d.id, ...d.data({ serverTimestamps: 'estimate' }) })));
+    }, () => {}));
     extraUnsubs.push(fs.onSnapshot(famCol('sehattyAppts'), snap => {
       notify('appts', { list: snap.docs.map(d => ({ id: d.id, ...d.data() })), fromCache: snap.metadata.fromCache });
     }, () => {}));
@@ -124,9 +134,20 @@ const Cloud = (() => {
     if (!live()) return Promise.resolve(false);
     return fb.fs.setDoc(famDoc('sehattyDays', date), { date, ...patch }, { merge: true }).then(() => true).catch(() => false);
   }
-  function addLog(text, kind) {
+  function addLog(text, kind, by) {
     if (!live()) return Promise.resolve(false);
-    return fb.fs.addDoc(famCol('sehattyLog'), { t: Date.now(), by: who(), uid: user.uid, text: String(text).slice(0, 200), kind: kind || '' })
+    return fb.fs.addDoc(famCol('sehattyLog'), { t: Date.now(), by: by || who(), uid: user.uid, text: String(text).slice(0, 200), kind: kind || '' })
+      .then(() => true).catch(() => false);
+  }
+  // ولي الأمر ينشر للأطفال موعد الولادة وحده (lmp بالميلي ثانية)
+  function publishKids(data) {
+    if (!live()) return Promise.resolve(false);
+    return fb.fs.setDoc(famDoc('apps', 'sehattyKids'), { ...data, at: fb.fs.serverTimestamp() }).then(() => true).catch(() => false);
+  }
+  // أي جهاز في العائلة (ومنه جهاز الطفل) يرسل قلبًا لماما
+  function sendHeart(name) {
+    if (!fb || !fid || !user) return Promise.resolve(false);
+    return fb.fs.addDoc(famCol('apps', 'sehattyKids', 'hearts'), { t: fb.fs.serverTimestamp(), name: String(name || '').slice(0, 40) })
       .then(() => true).catch(() => false);
   }
   function saveAppt(a) {
@@ -221,7 +242,7 @@ const Cloud = (() => {
   }
 
   return {
-    start, signIn, join, signOut, save, markTask, setDay, addLog, saveAppt, deleteAppt,
+    start, signIn, join, signOut, save, markTask, setDay, addLog, saveAppt, deleteAppt, publishKids, sendHeart,
     get live() { return live(); },
     on: fn => listeners.push(fn),
     get status() { return status; },

@@ -368,6 +368,41 @@ header.top{align-items:center}
 .role span{font-size:34px;line-height:1}
 .role:hover,.role:focus-visible{border-color:var(--accent);background:var(--accent-soft)}
 .wstep .pbtn{align-self:center}
+.hbtns{display:flex;gap:8px;flex-wrap:wrap}
+.kidv{display:none;flex-direction:column;gap:16px;max-width:560px;width:100%;margin-inline:auto}
+body.kidmode .kidv{display:flex}
+body.kidmode .tabs,body.kidmode .view,body.kidmode footer,body.kidmode .kidbtn,body.kidmode header.top .lede{display:none!important}
+body.kidmode{padding-bottom:32px!important}
+.kcard{background:var(--surface);border:3px solid #fff;border-radius:28px;padding:20px;box-shadow:0 10px 24px rgba(90,40,80,.10);display:flex;flex-direction:column;gap:10px;text-align:center}
+.kcard h3{font-size:20px;color:var(--accent)}
+.khi{font-size:18px;font-weight:700;color:var(--deep)}
+.kart{width:min(70vw,260px);height:auto;align-self:center;overflow:visible}
+#kBaby{transition:transform .8s cubic-bezier(.2,1.4,.4,1)}
+@media (prefers-reduced-motion:no-preference){.kart{animation:kbob 3s ease-in-out infinite}}
+@keyframes kbob{50%{transform:translateY(-8px)}}
+.khero h2{font-size:clamp(24px,6vw,32px);color:var(--accent);line-height:1.35}
+.kfact{font-size:18px;line-height:1.7}
+.kdays{display:flex;align-items:baseline;justify-content:center;gap:10px;flex-wrap:wrap}
+.kdays b{font-size:64px;line-height:1;color:var(--accent);font-family:var(--display)}
+.kdays span{font-size:22px;font-weight:700;color:var(--deep)}
+.kpath{display:grid;grid-template-columns:repeat(9,minmax(0,1fr));gap:6px;direction:rtl}
+.kpath i{aspect-ratio:1;border-radius:50%;background:var(--chip);border:2px solid var(--line);display:flex;align-items:center;justify-content:center;font-style:normal;font-size:clamp(11px,3vw,15px);font-weight:700;color:var(--muted)}
+.kpath i.past{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.kpath i.now{background:var(--accent);border-color:var(--accent);color:#fff;transform:scale(1.15)}
+.kmeta{color:var(--muted);font-size:14px}
+.kbig{font-size:56px}
+.knodata p{font-size:18px}
+.khelp{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.khelp li{background:var(--chip);border-radius:16px;padding:12px 14px;font-size:17px;font-weight:600}
+.kdua .ayah{font-size:24px}
+.kdua small{color:var(--muted)}
+.kheart{border:0;border-radius:999px;padding:18px 24px;font-size:22px;font-weight:800;color:#fff;background:linear-gradient(180deg,var(--accent),var(--accent-dark));box-shadow:0 8px 0 var(--accent-dark),0 14px 24px rgba(204,58,118,.35);align-self:center;transition:transform .1s}
+.kheart:active{transform:translateY(5px);box-shadow:0 3px 0 var(--accent-dark)}
+.ksent{text-align:center;font-weight:700;color:var(--accent);min-height:1.5em}
+.kexit{align-self:center}
+.fly{position:fixed;font-size:34px;pointer-events:none;z-index:30;animation:fly 1.6s ease-out forwards}
+@keyframes fly{to{transform:translate(var(--dx),-60vh) scale(1.4);opacity:0}}
+@media (prefers-reduced-motion:reduce){.fly{display:none}}
 textarea.copybox{width:100%;min-height:160px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink);font:inherit;font-size:13px;padding:8px}
 </style>
 
@@ -386,7 +421,8 @@ textarea.copybox{width:100%;min-height:160px;border:1px solid var(--line);border
       <svg class="logo" width="44" height="44" viewBox="0 0 44 44" aria-hidden="true"><rect width="44" height="44" rx="13" fill="var(--accent)"/><path d="M22 33.5s-10.5-6.4-10.5-13.6A5.9 5.9 0 0 1 22 16.6a5.9 5.9 0 0 1 10.5 3.3c0 7.2-10.5 13.6-10.5 13.6z" fill="#fff"/></svg>
       <div><h1>ضيفنا الجديد</h1><p class="lede">متابعة الحمل للعائلة: موعد الولادة، والأدوية، والطعام شهرًا بشهر.</p></div>
     </div>
-    <button class="acct" id="acctBtn" type="button"><i class="dot" id="acctDot"></i><span id="acctTxt">حساب العائلة</span></button>
+    <div class="hbtns"><button class="acct kidbtn" id="kidBtn" type="button"><span aria-hidden="true">🧒</span><span>للأطفال</span></button>
+    <button class="acct" id="acctBtn" type="button"><i class="dot" id="acctDot"></i><span id="acctTxt">حساب العائلة</span></button></div>
   </header>
 
   <nav class="tabs" aria-label="أقسام التطبيق">
@@ -396,6 +432,49 @@ textarea.copybox{width:100%;min-height:160px;border:1px solid var(--line);border
     <a class="tab" href="#meds" data-tab="meds"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 15.5l7-7a3.5 3.5 0 0 0-5-5l-7 7a3.5 3.5 0 0 0 5 5zM7 9l5 5" /></svg><span><span class="lg">أدويتي ونتيجتها</span><span class="sm">أدويتي</span></span><b class="tbadge" id="tBadge" hidden></b></a>
     <a class="tab" href="#tips" data-tab="tips"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9V16h7v-2.1A6 6 0 0 0 12 3z" /></svg><span>نصائح</span></a>
   </nav>
+
+  <section class="kidv" id="kidView" aria-label="واجهة الأطفال">
+    <div class="kcard khero">
+      <p class="khi" id="kHi">أهلًا يا بطل!</p>
+      <svg class="kart" viewBox="0 30 512 482" aria-hidden="true">
+        <path d="M256 478C118 392 46 312 46 210a105 105 0 0 1 210-38 105 105 0 0 1 210 38c0 102-72 182-210 268z" fill="#ff8fb5" stroke="#cc3a76" stroke-width="12" stroke-linejoin="round"/>
+        <path d="M150 168a62 62 0 0 1 70-34" fill="none" stroke="#ffd3e4" stroke-width="14" stroke-linecap="round"/>
+        <g id="kBaby" style="transform-origin:256px 318px">
+          <ellipse cx="256" cy="352" rx="104" ry="72" fill="#fff6fa" stroke="#f5a9c8" stroke-width="8"/>
+          <path d="M170 336q86 40 172 0" fill="none" stroke="#f5a9c8" stroke-width="7" stroke-linecap="round"/>
+          <circle cx="256" cy="268" r="74" fill="#ffe6c7" stroke="#b97f63" stroke-width="7"/>
+          <path d="M240 197q10-26 34-12q-14 2-12 16" fill="none" stroke="#b97f63" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M214 266q14 12 28 0M270 266q14 12 28 0" fill="none" stroke="#4a2b45" stroke-width="7" stroke-linecap="round"/>
+          <ellipse cx="208" cy="292" rx="15" ry="10" fill="#ffb9d0"/><ellipse cx="304" cy="292" rx="15" ry="10" fill="#ffb9d0"/>
+          <path d="M246 302q10 8 20 0" fill="none" stroke="#c75b6e" stroke-width="6" stroke-linecap="round"/>
+        </g>
+      </svg>
+      <h2 id="kTitle">ضيفنا الجديد</h2>
+      <p class="kfact" id="kFact"></p>
+    </div>
+    <div class="kcard kcount" id="kCount">
+      <div class="kdays"><b class="num" id="kDays">0</b><span id="kDaysTxt">يومًا ونلتقي!</span></div>
+      <div class="kpath" id="kPath" aria-hidden="true"></div>
+      <p class="kmeta" id="kMeta"></p>
+    </div>
+    <div class="kcard knodata" id="kNoData" hidden>
+      <div class="kbig" aria-hidden="true">🎈</div>
+      <p id="kNoTxt"></p>
+      <button class="btn primary" id="kJoin" type="button">عندي رمز من ماما أو بابا</button>
+    </div>
+    <div class="kcard">
+      <h3>كيف تساعد ماما اليوم؟</h3>
+      <ul class="khelp" id="kHelp"></ul>
+    </div>
+    <div class="kcard kdua">
+      <h3>ادعُ لماما وللضيف الجديد 🤲</h3>
+      <span class="ayah">رَبِّ هَبْ لِي مِنَ الصَّالِحِينَ</span>
+      <small>سورة الصافات: 100</small>
+    </div>
+    <button class="kheart" id="kHeart" type="button">أرسل قلبًا لماما 💗</button>
+    <p class="ksent" id="kSent" aria-live="polite"></p>
+    <button class="pbtn kexit" id="kExit" type="button">خروج من وضع الأطفال</button>
+  </section>
 
   <section class="view narrow" id="v-today" hidden>
     <div class="panel thead" id="tHead"></div>
@@ -1014,6 +1093,7 @@ function renderDue(){
   if(typeof renderMonths==='function') renderMonths();
   try{renderToday()}catch(e){}
   pushCloud();
+  try{publishKidsMaybe(); renderKids();}catch(e){}
 }
 $('dueForm').addEventListener('input',()=>{
   dueState={method:$('d_method').value,date:$('d_date').value,cycle:$('d_cycle').value,usw:$('d_usw').value,usd:$('d_usd').value};
@@ -1051,7 +1131,7 @@ function maybeWelcome(){
   const st=Cloud.status;
   if(st==='loading'||st==='linking') return;
   if((st==='ok'||st==='offline')&&!dueState.example) return;
-  if(st==='kid'){ $('wKidHint').hidden=true; $('wKidCode').hidden=true; $('wKidBack').hidden=true; wShow('wKid'); return; }
+  if(st==='kid'){ closeWelcome(); applyKidMode(); return; }
   wShow('wWho');
 }
 $('welcome').addEventListener('click',e=>{
@@ -1063,7 +1143,7 @@ $('welcome').addEventListener('click',e=>{
 $('wDadAcct').onclick=()=>{closeWelcome(); openAcct();};
 $('wDadDate').onclick=()=>wShow('wMom');
 $('wKidCode').onclick=()=>{closeWelcome(); openAcct();};
-$('wKidOk').onclick=closeWelcome;
+$('wKidOk').onclick=()=>{ closeWelcome(); applyKidMode(); };
 Cloud.on(what=>{ if(what==='status') setTimeout(maybeWelcome,0); });
 setTimeout(maybeWelcome,0); setTimeout(maybeWelcome,3000);
 
@@ -1298,7 +1378,8 @@ function renderToday(){
       ${x.id?`<button class="del" type="button" data-delappt="${x.id}" aria-label="حذف">×</button>`:'<span></span>'}</div>`;}).join('')
     : '<p class="empty">لا شيء خلال الأسابيع الثلاثة القادمة. أضيفي مواعيد الطبيب والتحاليل لتظهر هنا.</p>';
   const s=streak(); $('tStreak').textContent = s? `الالتزام بالأدوية: ${s} ${s===1?'يوم':s<=10?'أيام':'يومًا'} متتالية` : '';
-  $('tLog').innerHTML = TS.log.length ? TS.log.slice(0,40).map(l=>`<li><span class="ic ${l.kind==='appt'?'appt':l.kind==='water'?'water':l.kind==='dua'?'dua':''}" aria-hidden="true">${l.kind==='appt'?'📅':l.kind==='water'?'💧':l.kind==='dua'?'🤲':'✓'}</span><span>${l.by?`<b>${esc(l.by)}</b> · `:''}${esc(l.text)}</span><time>${whenTxt(l.t)}</time></li>`).join('')
+  const LOGALL=TS.log.concat((typeof HEARTS!=='undefined'?HEARTS:[]).map(h=>({t:h.t&&h.t.toMillis?h.t.toMillis():Date.now(),by:h.name||'طفل',text:'أرسل قلبًا لماما 💗',kind:'heart'}))).sort((a,b)=>b.t-a.t);
+  $('tLog').innerHTML = LOGALL.length ? LOGALL.slice(0,40).map(l=>`<li><span class="ic ${l.kind==='appt'?'appt':l.kind==='water'?'water':l.kind==='dua'||l.kind==='heart'?'dua':''}" aria-hidden="true">${l.kind==='appt'?'📅':l.kind==='water'?'💧':l.kind==='dua'?'🤲':l.kind==='heart'?'💗':'✓'}</span><span>${l.by?`<b>${esc(l.by)}</b> · `:''}${esc(l.text)}</span><time>${whenTxt(l.t)}</time></li>`).join('')
     : '<li><span></span><span class="empty">ستظهر هنا كل مهمة تُنجز وكل موعد يُضاف، مع اسم من قام بها.</span><span></span></li>';
   const left=total-nDone; $('todayBadge').hidden=!left; $('todayBadge').textContent=left;
 }
@@ -1371,6 +1452,82 @@ Cloud.on((what,x)=>{
 setInterval(()=>{ if(!document.hidden) renderToday(); }, 60000);
 
 $('duaList').innerHTML=DUAS.map(d=>`<div><b>${esc(d.n)}</b><span class="ayah">${d.t}</span><small>${esc(d.src)}</small></div>`).join('');
+/* ===== واجهة الأطفال ===== */
+// جهاز الطفل يقرأ موعد الولادة وحده من apps/sehattyKids، وجوال الوالدين يفتحها بزر «للأطفال».
+var kidsDoc=null, HEARTS=[], lastKidsLmp=null, kidFlag=false, heartAt=0;
+try{kidFlag=localStorage.getItem(KEY+'-kidmode')==='1'}catch(e){}
+const KIDFACT={1:'ضيفنا الجديد صغير جدًا الآن، أصغر من حبة سمسم! لكنه بدأ رحلته ليأتي إلينا.',2:'صار له قلب صغير ينبض بسرعة: دُق دُق دُق!',3:'صارت له يدان صغيرتان وأصابع، ويتحرك في بطن ماما.',4:'بدأ يسمع الأصوات. قل له: السلام عليكم يا ضيفنا!',5:'صار يركل ويتقلّب! ماما تشعر بحركته الآن.',6:'يسمع صوتك جيدًا. احكِ له قصة قصيرة قرب بطن ماما.',7:'صار يفتح عينيه ويغمضهما، ويعرف صوت ماما.',8:'ينام كثيرًا ويكبر بسرعة ليصير قويًا.',9:'صار جاهزًا تقريبًا! قريبًا نحمله ونلعب معه.'};
+const KIDHELP=['أحضِر لماما كوب ماء 💧','رتّب ألعابك لتريح ماما 🧸','تكلّم بهدوء حين ترتاح ماما 🤫','أعطِ ماما حضنًا كبيرًا 🤗','ساعد في ترتيب المائدة 🍽️','ضع يدك على بطن ماما وقل له: أحبك 💗','فكّر في اسم تحبه لضيفنا وأخبر ماما وبابا ✨','ادعُ لماما بالصحة وللضيف الجديد 🤲','اقرأ لضيفنا سورة قصيرة بصوت جميل 📖'];
+const role=()=>{try{return localStorage.getItem(KEY+'-role')||''}catch(e){return ''}};
+const isKidMode=()=>Cloud.status==='kid'||role()==='kid'||kidFlag;
+function kidLmp(){
+  if(Cloud.status==='kid') return kidsDoc&&typeof kidsDoc.lmp==='number'?kidsDoc.lmp:null;
+  if(role()==='kid'&&!Cloud.live) return null;
+  return dueState.example?null:lmpFrom();
+}
+function applyKidMode(){
+  const on=isKidMode(); document.body.classList.toggle('kidmode',on);
+  if(on){ renderKids(); window.scrollTo(0,0); }
+}
+function renderKids(){
+  if(!document.body.classList.contains('kidmode')) return;
+  const L=kidLmp(), st=Cloud.status, name=(st==='kid'&&Cloud.who)?Cloud.who:'';
+  $('kHi').textContent= name?`أهلًا يا ${name}!`:'أهلًا يا بطل!';
+  $('kExit').hidden= st==='kid';
+  $('kExit').textContent= role()==='kid'&&!kidFlag ? 'أنا لست طفلًا' : 'خروج من وضع الأطفال';
+  const has=L!=null; $('kCount').hidden=!has; $('kNoData').hidden=has;
+  if(!has){
+    $('kTitle').textContent='ضيفنا الجديد في الطريق!';
+    $('kFact').textContent='ماما وبابا ينتظران ضيفًا جديدًا 💗';
+    $('kNoTxt').textContent= st==='kid' ? 'لم يُضف ماما وبابا موعد الضيف الجديد بعد. اطلب منهما أن يضيفاه في التطبيق.' : 'اطلب من بابا أو ماما رمز الانضمام من مجلس العائلة، لترى كيف يكبر ضيفنا كل أسبوع.';
+    $('kJoin').hidden= st==='kid'||st==='ok'||st==='offline';
+    $('kBaby').style.transform='scale(.55)';
+  } else {
+    const now=todayU(), ga=Math.max(0,Math.floor((now-L)/DAY)), wk=Math.floor(ga/7)+1, edd=L+280*DAY;
+    const M=MONTHS.find(x=>wk>=x.w[0]&&wk<=x.w[1])||MONTHS[wk>40?8:0];
+    const left=Math.round((edd-now)/DAY);
+    $('kTitle').textContent=`ضيفنا الجديد الآن ${M.size.split('،')[0]} ${M.fruit}`;
+    $('kFact').textContent=KIDFACT[M.m];
+    $('kDays').textContent=Math.max(0,left);
+    $('kDaysTxt').textContent= left>0?(left===1?'يومًا واحدًا ونلتقي!':'يومًا ونلتقي!'):'وصل وقت اللقاء! 🎉';
+    $('kPath').innerHTML=MONTHS.map(x=>`<i class="${x.m<M.m?'past':x.m===M.m?'now':''}">${x.m===M.m?M.fruit:x.m}</i>`).join('');
+    $('kMeta').textContent=`نحن في الشهر ${M.m} من 9`;
+    $('kBaby').style.transform=`scale(${(0.5+0.5*Math.min(ga/280,1)).toFixed(3)})`;
+  }
+  const di=dayIndex(); $('kHelp').innerHTML=[0,1,2].map(i=>`<li>${KIDHELP[(di+i*3)%KIDHELP.length]}</li>`).join('');
+}
+function flyHearts(){
+  const b=$('kHeart').getBoundingClientRect();
+  for(let i=0;i<7;i++){ const h=document.createElement('span'); h.className='fly'; h.textContent=['💗','💖','💕'][i%3];
+    h.style.left=(b.left+b.width/2-17)+'px'; h.style.top=(b.top-10)+'px'; h.style.setProperty('--dx',((i-3)*28)+'px'); h.style.animationDelay=(i*0.08)+'s';
+    document.body.appendChild(h); setTimeout(()=>h.remove(),2000); }
+}
+$('kHeart').onclick=async()=>{
+  flyHearts();
+  if(Date.now()-heartAt<8000){ $('kSent').textContent='وصل قلبك لماما 💗'; return; }
+  heartAt=Date.now();
+  const st=Cloud.status;
+  if(st==='kid'){ $('kSent').textContent='يُرسل…'; const ok=await Cloud.sendHeart(Cloud.who||''); $('kSent').textContent= ok?'وصل قلبك لماما 💗':'سيصل قلبك حين يعود الإنترنت 💗'; return; }
+  if(Cloud.live){ Cloud.sendHeart('الأطفال'); $('kSent').textContent='وصل قلبك لماما 💗'; return; }
+  if(role()!=='kid'){ TS.log.unshift({t:Date.now(),by:'الأطفال',text:'أرسلوا قلبًا لماما 💗',kind:'heart'}); TS.log=TS.log.slice(0,100); saveTS(); }
+  $('kSent').textContent='وصل قلبك لماما 💗';
+};
+$('kidBtn').onclick=()=>{ kidFlag=true; try{localStorage.setItem(KEY+'-kidmode','1')}catch(e){} applyKidMode(); };
+$('kExit').onclick=()=>{ if(kidFlag){ kidFlag=false; try{localStorage.removeItem(KEY+'-kidmode')}catch(e){} } else { try{localStorage.removeItem(KEY+'-role')}catch(e){} }
+  applyKidMode(); if(!isKidMode()){ route(); renderToday(); } };
+$('kJoin').onclick=()=>openAcct();
+function publishKidsMaybe(){
+  if(!Cloud.live||!['ok','offline'].includes(Cloud.status)||dueState.example) return;
+  const L=lmpFrom(); if(L==null||L===lastKidsLmp) return;
+  lastKidsLmp=L; Cloud.publishKids({lmp:L});
+}
+Cloud.on((what,x)=>{
+  if(what==='status'){ if(!['ok','offline'].includes(Cloud.status)) lastKidsLmp=null; setTimeout(()=>{ publishKidsMaybe(); applyKidMode(); },0); }
+  if(what==='kids'){ kidsDoc=x; renderKids(); }
+  if(what==='hearts'){ HEARTS=x; renderToday(); }
+  if(what==='data') setTimeout(publishKidsMaybe,0);
+});
+
 const TABS=['today','pregnancy','months','meds','tips'];
 function route(){
   const jm=(location.hash||'').match(/join=([0-9A-Z]{8})/i);
@@ -1383,5 +1540,5 @@ function route(){
 }
 $('mstripGo').onclick=()=>$('resultTop').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'});
 window.addEventListener('hashchange',route);
-render(); renderToday(); route();
+render(); renderToday(); route(); applyKidMode();
 </script>

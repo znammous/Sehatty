@@ -404,6 +404,13 @@ body.kidmode{padding-bottom:32px!important}
 @keyframes fly{to{transform:translate(var(--dx),-60vh) scale(1.4);opacity:0}}
 @media (prefers-reduced-motion:reduce){.fly{display:none}}
 #wMom [data-wback]{display:none}
+.devs{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px;text-align:start}
+.dev{display:grid;grid-template-columns:30px minmax(0,1fr) auto;gap:10px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px 10px}
+.dev .dic{font-size:20px;text-align:center}
+.dev b{display:block;font-size:14.5px}
+.dev small{display:block;color:var(--muted);font-size:12px;line-height:1.5}
+.dcut{padding:5px 10px;font-size:13px;color:var(--bad);border-color:var(--bad-soft)}
+.dcut.arm{background:var(--bad);color:#fff;border-color:var(--bad)}
 textarea.copybox{width:100%;min-height:160px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink);font:inherit;font-size:13px;padding:8px}
 </style>
 
@@ -454,7 +461,7 @@ textarea.copybox{width:100%;min-height:160px;border:1px solid var(--line);border
       <p class="kfact" id="kFact"></p>
     </div>
     <div class="kcard kcount" id="kCount">
-      <div class="kdays"><b class="num" id="kDays">0</b><span id="kDaysTxt">يومًا ونلتقي!</span></div>
+      <div class="kdays"><b class="num" id="kDays">0</b><span id="kDaysTxt">يومًا ونلتقي بإذن الله!</span></div>
       <div class="kpath" id="kPath" aria-hidden="true"></div>
       <p class="kmeta" id="kMeta"></p>
     </div>
@@ -1225,6 +1232,18 @@ function applyRemote(d){
     renderDue(); render();
   } finally { applying=false; }
 }
+var DEVICES=null;
+const APP_NAMES={sehatty:'ضيفنا الجديد',familyChat:'مجلس العائلة',jungleHero:'أبطال الغابة',spellingHero:'أبطال الإملاء',tableHero:'جدول الأبطال'};
+function devicesHtml(){
+  const head=`<div class="panel-head"><h3>الأجهزة المرتبطة</h3><span class="hint">${DEVICES?DEVICES.length+' '+(DEVICES.length===1?'جهاز':'أجهزة'):''}</span></div>`;
+  if(!DEVICES) return head+'<p class="hint">جارٍ التحميل…</p>';
+  const owner=Cloud.owner?`<li class="dev"><span class="dic" aria-hidden="true">👑</span><span class="dmain"><b>${esc(Cloud.who||'صاحب الحساب')} (أنت)</b><small>صاحب الحساب · دخول بحساب Google</small></span></li>`:'';
+  const items=DEVICES.map(d=>`<li class="dev"><span class="dic" aria-hidden="true">${d.guardian?'👤':'🧒'}</span>
+    <span class="dmain"><b>${esc(d.name||'بلا اسم')}${d.me?' (أنت)':''}</b><small>${d.guardian?'ولي أمر':'جهاز طفل'}${d.apps.length?' · '+d.apps.map(a=>APP_NAMES[a]||a).join('، '):''}${d.at?' · منذ '+new Date(d.at).toLocaleDateString('ar-SY-u-nu-latn',{day:'numeric',month:'short',year:'numeric'}):''}</small></span>
+    ${d.me?'':`<button class="btn dcut" type="button" data-cut="${d.id}">فصل</button>`}</li>`).join('');
+  return head+`<ul class="devs">${owner}${items||'<li class="hint">لا توجد أجهزة أخرى مرتبطة بعد.</li>'}</ul>
+    <p class="hint">الفصل يفصل الجهاز عن تطبيقات العائلة كلها، ويحتاج رمزًا جديدًا من مجلس العائلة للعودة.</p>`;
+}
 const ACCT_TXT={local:'محفوظ في هذا الجهاز',loading:'جارٍ الاتصال…',linking:'جارٍ الربط…',out:'حساب العائلة',ok:'محفوظ في حساب العائلة',offline:'بلا اتصال، يُحفظ لاحقًا',kid:'جهاز طفل'};
 const JOIN_ERR={'bad-code':'الرمز 8 أحرف أو أرقام، تأكدي منه.',expired:'الرمز غير صحيح أو انتهت صلاحيته (عشر دقائق). اطلبي رمزًا جديدًا.',network:'تعذّر الاتصال، تأكدي من الإنترنت ثم أعيدي المحاولة.','signed-in':'هذا الجهاز داخل بحساب Google بالفعل.',unavailable:'الاتصال بحساب العائلة غير متاح الآن.'};
 function renderAcct(){
@@ -1248,9 +1267,10 @@ function renderAcct(){
   } else if(st==='ok'||st==='offline'){
     b.innerHTML=`<div class="who">✓ متصل بحساب العائلة${Cloud.who?' · '+esc(Cloud.who):''}</div>
       <p>بيانات الحمل والأدوية تُحفظ تلقائيًا وتظهر على أجهزة أولياء الأمر في العائلة.${st==='offline'?' لا يوجد اتصال الآن، وستُحفظ التغييرات حين يعود.':''}</p>
-      <button class="btn" id="outBtn" type="button">خروج من هذا الجهاز</button>`;
+      <button class="btn" id="outBtn" type="button">خروج من هذا الجهاز</button>
+      ${devicesHtml()}`;
   } else if(st==='kid'){
-    b.innerHTML=`<p>هذا الجهاز مرتبط بالعائلة كجهاز طفل، فلا تظهر عليه البيانات الطبية. واجهة الأطفال قادمة قريبًا.</p>
+    b.innerHTML=`<p>هذا الجهاز مرتبط بالعائلة كجهاز طفل، فيرى واجهة الأطفال ولا تظهر عليه البيانات الطبية.</p>
       <p class="hint">للأم أو الأب: اطلبوا من مجلس العائلة رمز «ولي أمر آخر».</p>
       <button class="btn" id="outBtn" type="button">خروج من هذا الجهاز</button>`;
   } else if(st==='local'){
@@ -1270,6 +1290,12 @@ $('aBody').addEventListener('click',async e=>{
   const lk=e.target.closest('button.look'); if(lk){setLook(lk.dataset.look);return;}
   if(e.target.id==='gBtn'){
     try{ await Cloud.signIn(); }catch(err){ if(!/popup-closed|cancelled-popup/.test(err.code||'')) toast('تعذّر الدخول بحساب Google'); }
+  }
+  const cut=e.target.closest('[data-cut]');
+  if(cut){
+    if(!cut.classList.contains('arm')){ cut.classList.add('arm'); cut.textContent='تأكيد الفصل'; setTimeout(()=>{ if(cut.isConnected){ cut.classList.remove('arm'); cut.textContent='فصل'; } },4000); return; }
+    cut.disabled=true; cut.textContent='يُفصل…';
+    const ok=await Cloud.removeDevice(cut.dataset.cut); toast(ok?'فُصل الجهاز عن العائلة':'تعذّر الفصل، أعيدوا المحاولة'); if(!ok) renderAcct(); return;
   }
   if(e.target.id==='localBtn'){ try{localStorage.setItem(KEY+'-role','mom')}catch(err){} $('acct').hidden=true; applyKidMode(); route(); renderToday(); maybeWelcome(); return; }
   if(e.target.id==='outBtn'){ e.target.disabled=true; try{localStorage.removeItem(KEY+'-role');localStorage.removeItem(KEY+'-parent')}catch(err){} await Cloud.signOut().catch(()=>{}); cloudReady=false; toast('خرج هذا الجهاز من حساب العائلة'); renderAcct(); }
@@ -1504,7 +1530,7 @@ function renderKids(){
     $('kTitle').textContent=`ضيفنا الجديد الآن ${M.size.split('،')[0]} ${M.fruit}`;
     $('kFact').textContent=KIDFACT[M.m];
     $('kDays').textContent=Math.max(0,left);
-    $('kDaysTxt').textContent= left>0?(left===1?'يومًا واحدًا ونلتقي!':'يومًا ونلتقي!'):'وصل وقت اللقاء! 🎉';
+    $('kDaysTxt').textContent= left>0?(left===1?'يومًا واحدًا ونلتقي بإذن الله!':'يومًا ونلتقي بإذن الله!'):'اقترب وقت اللقاء بإذن الله! 🎉';
     $('kPath').innerHTML=MONTHS.map(x=>`<i class="${x.m<M.m?'past':x.m===M.m?'now':''}">${x.m===M.m?M.fruit:x.m}</i>`).join('');
     $('kMeta').textContent=`نحن في الشهر ${M.m} من 9`;
     $('kBaby').style.transform=`scale(${(0.5+0.5*Math.min(ga/280,1)).toFixed(3)})`;
@@ -1540,6 +1566,7 @@ Cloud.on((what,x)=>{
     try{ if(Cloud.live&&(st==='ok'||st==='offline')) localStorage.setItem(KEY+'-parent','1'); else if(st==='out'||st==='kid') localStorage.removeItem(KEY+'-parent'); }catch(e){}
     setTimeout(()=>{ publishKidsMaybe(); if(applyKidMode()&&!isKidMode()) route(); maybeWelcome(); },0); }
   if(what==='kids'){ kidsDoc=x; renderKids(); }
+  if(what==='devices'){ DEVICES=x; if(!$('acct').hidden&&['ok','offline'].includes(Cloud.status)) renderAcct(); }
   if(what==='hearts'){ HEARTS=x; renderToday(); }
   if(what==='data') setTimeout(publishKidsMaybe,0);
 });

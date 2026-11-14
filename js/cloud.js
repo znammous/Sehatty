@@ -85,6 +85,11 @@ const Cloud = (() => {
       if (m && m.exists() === false && !m.metadata.fromCache) { ls.set(FID_KEY, null); fid = null; set('out'); return; }
       parent = !!(g && g.exists());
       guardName = parent ? (g.data().name || '') : '';
+      // ولي الأمر فصل هذا الجهاز: يخرج فورًا وتُغلق اتصالاته (كما في مجلس العائلة)
+      extraUnsubs.push(fb.fs.onSnapshot(famDoc('members', u.uid), snap => {
+        if (snap.metadata.fromCache || snap.exists()) return;
+        ls.set(FID_KEY, null); stopAll(); fid = null; set('out');
+      }, () => {}));
     } else parent = true;
     if (!parent) {
       set('kid');
@@ -117,6 +122,15 @@ const Cloud = (() => {
     extraUnsubs.push(fs.onSnapshot(fs.query(famCol('apps', 'sehattyKids', 'hearts'), fs.orderBy('t', 'desc'), fs.limit(30)), snap => {
       notify('hearts', snap.docs.map(d => ({ id: d.id, ...d.data({ serverTimestamps: 'estimate' }) })));
     }, () => {}));
+    // الأجهزة المرتبطة بالعائلة: سجلّ members مع أولياء الأمر الآخرين في guardians
+    let mem = null, gua = null;
+    const pushDevices = () => {
+      if (!mem || !gua) return;
+      notify('devices', mem.map(d => ({ id: d.id, name: (gua[d.id] && gua[d.id].name) || d.name || '', guardian: !!gua[d.id], apps: Object.keys(d.apps || {}), at: d.at || 0, me: d.id === user.uid }))
+        .sort((a, b) => (b.guardian - a.guardian) || (b.at - a.at)));
+    };
+    extraUnsubs.push(fs.onSnapshot(famCol('members'), snap => { mem = snap.docs.map(d => ({ id: d.id, ...d.data() })); pushDevices(); }, () => {}));
+    extraUnsubs.push(fs.onSnapshot(famCol('guardians'), snap => { gua = {}; snap.docs.forEach(d => { gua[d.id] = d.data(); }); pushDevices(); }, () => {}));
     extraUnsubs.push(fs.onSnapshot(famCol('sehattyAppts'), snap => {
       notify('appts', { list: snap.docs.map(d => ({ id: d.id, ...d.data() })), fromCache: snap.metadata.fromCache });
     }, () => {}));
@@ -149,6 +163,15 @@ const Cloud = (() => {
     if (!fb || !fid || !user) return Promise.resolve(false);
     return fb.fs.addDoc(famCol('apps', 'sehattyKids', 'hearts'), { t: fb.fs.serverTimestamp(), name: String(name || '').slice(0, 40) })
       .then(() => true).catch(() => false);
+  }
+  // ولي الأمر يفصل جهازاً عن العائلة كلها، كما في مجلس العائلة: يلغي صلاحيات ولي الأمر ويحذف سجلّه،
+  // ويُعلَّم ملفه في المجلس بالفصل (إن وُجد) لتبقى رسائله باسمه
+  async function removeDevice(id) {
+    if (!live() || id === user.uid) return false;
+    await fb.fs.deleteDoc(famDoc('guardians', id)).catch(() => {});
+    const ok = await fb.fs.deleteDoc(famDoc('members', id)).then(() => true).catch(() => false);
+    await fb.fs.updateDoc(famDoc('chatUsers', id), { left: Date.now() }).catch(() => {});
+    return ok;
   }
   function saveAppt(a) {
     if (!live()) return Promise.resolve(false);
@@ -242,7 +265,8 @@ const Cloud = (() => {
   }
 
   return {
-    start, signIn, join, signOut, save, markTask, setDay, addLog, saveAppt, deleteAppt, publishKids, sendHeart,
+    start, signIn, join, signOut, save, markTask, setDay, addLog, saveAppt, deleteAppt, publishKids, sendHeart, removeDevice,
+    get owner() { return !!(user && !user.isAnonymous); },
     get live() { return live(); },
     on: fn => listeners.push(fn),
     get status() { return status; },

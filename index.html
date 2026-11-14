@@ -454,6 +454,104 @@ body.kidmode .setbtn{display:none!important}
 .kpills i.done{background:linear-gradient(90deg,var(--accent) 0 50%,#fff 50%)}
 .kmeds.late{border-color:var(--warn)}
 textarea.copybox{width:100%;min-height:160px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink);font:inherit;font-size:13px;padding:8px}
+/* ===== صفحة الهبوط: لمن لم يسجّل الدخول ===== */
+.land{display:none;flex-direction:column;gap:56px;max-width:1080px;width:100%;margin-inline:auto;padding-bottom:24px}
+body.landing .land{display:flex}
+body.landing .tabs,body.landing .view,body.landing footer,body.landing header.top,body.landing .kidv{display:none!important}
+body.landing{padding-bottom:24px!important}
+.land h2{font-family:var(--display);color:var(--deep);line-height:1.3}
+.lsec-h{text-align:center;display:flex;flex-direction:column;gap:6px;align-items:center;margin-bottom:22px}
+.lsec-h h2{font-size:clamp(25px,5vw,36px)}
+.lsec-h p{color:var(--muted);font-size:17px;max-width:560px;line-height:1.7}
+.ltag{display:inline-flex;align-items:center;gap:6px;background:#fff;color:var(--accent);border:2px solid var(--accent-soft);border-radius:999px;padding:4px 14px;font-weight:700;font-size:14px}
+.lhero{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:28px;align-items:center;padding-top:12px}
+.lhero-txt{display:flex;flex-direction:column;gap:16px;align-items:flex-start}
+.lbrand{display:flex;align-items:center;gap:10px;font-weight:800;color:var(--deep);font-size:18px}
+.lhero h1{font-family:var(--display);font-size:clamp(40px,8vw,66px);line-height:1.15;color:var(--accent)}
+.lhero h1 span{display:block;color:var(--deep);font-size:.52em;margin-top:6px}
+.lhero p.llede{font-size:clamp(17px,2.4vw,20px);line-height:1.8;color:var(--ink);max-width:520px}
+.lcta{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.lbtn{border:0;border-radius:999px;padding:15px 26px;font-size:18px;font-weight:800;cursor:pointer;font-family:inherit;text-decoration:none;display:inline-flex;align-items:center;gap:8px;transition:transform .15s}
+.lbtn.main{color:#fff;background:linear-gradient(180deg,var(--accent),var(--accent-dark));box-shadow:0 6px 0 var(--accent-dark),0 12px 22px rgba(204,58,118,.3)}
+.lbtn.main:active{transform:translateY(4px);box-shadow:0 2px 0 var(--accent-dark)}
+.lbtn.alt{background:#fff;color:var(--deep);border:2px solid var(--line);box-shadow:0 6px 16px rgba(90,40,80,.08)}
+.lbtn.alt:hover,.lbtn.alt:focus-visible{border-color:var(--accent)}
+.lsub{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:15px}
+.lsub .pbtn{font-size:15px;font-weight:700}
+.lnote{color:var(--muted);font-size:14px;display:flex;gap:6px;align-items:center}
+.lart{width:100%;height:auto;max-width:480px;justify-self:center;overflow:visible}
+@media (prefers-reduced-motion:no-preference){.lart .bob{animation:kbob 3.4s ease-in-out infinite}.lart .tw{animation:ltw 2.6s ease-in-out infinite}.lart .tw2{animation:ltw 3.1s ease-in-out -1.2s infinite}}
+@keyframes ltw{50%{opacity:.25;transform:scale(.8)}}
+.lart .tw,.lart .tw2{transform-box:fill-box;transform-origin:center}
+.lshow{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:22px}
+.lshot{display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center;margin:0}
+.lshot figcaption b{display:block;font-size:18px;color:var(--deep)}
+.lshot figcaption span{color:var(--muted);font-size:14.5px;line-height:1.6}
+.phone{position:relative;width:100%;max-width:250px;aspect-ratio:390/760;border-radius:34px;border:9px solid #3b2238;background:var(--sky2);overflow:hidden;box-shadow:0 22px 40px rgba(90,40,80,.22),inset 0 0 0 2px rgba(255,255,255,.12)}
+.phone::before{content:"";position:absolute;top:7px;left:50%;transform:translateX(-50%);width:34%;height:15px;border-radius:999px;background:#3b2238;z-index:2}
+.phone img{display:block;width:100%;height:100%;object-fit:cover;object-position:top}
+.lshot:nth-child(even) .phone{transform:translateY(22px)}
+.lfeat{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.lcard{background:var(--surface);border:3px solid #fff;border-radius:26px;padding:20px;box-shadow:0 10px 24px rgba(90,40,80,.08);display:flex;flex-direction:column;gap:8px}
+.lcard .lic{width:54px;height:54px;border-radius:18px;background:var(--accent-soft);display:flex;align-items:center;justify-content:center;font-size:28px}
+.lcard h3{font-size:19px;color:var(--deep)}
+.lcard p{color:var(--muted);line-height:1.75;font-size:15.5px}
+.lkids{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:28px;align-items:center;background:linear-gradient(160deg,#fff 0%,var(--surface) 60%,var(--accent-soft) 100%);border:3px solid #fff;border-radius:36px;padding:32px;box-shadow:0 14px 34px rgba(90,40,80,.1)}
+.lkids .phones{display:flex;justify-content:center;gap:14px}
+.lkids .phone{max-width:210px}
+.lkids .phone+.phone{transform:translateY(30px)}
+.lkids-txt{display:flex;flex-direction:column;gap:14px}
+.lkids-txt h2{font-size:clamp(25px,4.6vw,34px)}
+.lkids-txt>p{font-size:17px;line-height:1.8}
+.lchecks{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.lchecks li{display:flex;gap:10px;align-items:flex-start;font-size:16.5px;line-height:1.65;font-weight:600}
+.lchecks li i{font-style:normal;flex:none;width:32px;height:32px;border-radius:11px;background:#fff;display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 3px 8px rgba(90,40,80,.08)}
+.lfam{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.lfam .lcard{align-items:center;text-align:center}
+.lfam .lav{font-size:46px;width:84px;height:84px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 16px rgba(90,40,80,.1)}
+.lsteps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;counter-reset:st}
+.lsteps .lcard{position:relative;padding-top:30px}
+.lsteps .lcard::before{counter-increment:st;content:counter(st);position:absolute;top:-16px;inset-inline-start:20px;width:40px;height:40px;border-radius:50%;background:var(--accent);color:#fff;font-weight:800;font-size:20px;display:flex;align-items:center;justify-content:center;box-shadow:0 5px 12px rgba(204,58,118,.35)}
+.lsafe{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.lsafe div{background:#fff;border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:6px;border:2px solid var(--line)}
+.lsafe b{font-size:16px;color:var(--deep)}
+.lsafe span{color:var(--muted);font-size:14.5px;line-height:1.65}
+.lsafe em{font-style:normal;font-size:26px}
+.lend{text-align:center;display:flex;flex-direction:column;align-items:center;gap:16px;background:linear-gradient(180deg,var(--accent),var(--accent-dark));color:#fff;border-radius:36px;padding:40px 22px;box-shadow:0 16px 36px rgba(204,58,118,.3)}
+.lend h2{color:#fff;font-size:clamp(26px,5vw,38px)}
+.lend p{font-size:17px;opacity:.95;line-height:1.7;max-width:520px}
+.lend .lbtn.main{background:#fff;color:var(--accent);box-shadow:0 6px 0 rgba(0,0,0,.18)}
+.lend .lcta{justify-content:center}
+.lend .lbtn.alt{background:transparent;color:#fff;border-color:rgba(255,255,255,.6);box-shadow:none}
+.lfoot{text-align:center;color:var(--muted);font-size:13.5px;line-height:1.8;max-width:700px;margin-inline:auto}
+@media (max-width:880px){
+  .lhero{grid-template-columns:1fr;text-align:center}
+  .lhero-txt{align-items:center}.lhero p.llede{margin-inline:auto}.lcta,.lsub{justify-content:center}
+  .lart{max-width:340px;order:-1}
+  .lshow{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:16px;padding:6px 16px 34px;margin-inline:-16px;scrollbar-width:none}
+  .lshow::-webkit-scrollbar{display:none}
+  .lshot{flex:0 0 68%;scroll-snap-align:center}
+  .lshot:nth-child(even) .phone{transform:none}
+  .lfeat,.lfam{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .lkids{grid-template-columns:1fr;padding:24px 18px}
+  .lsafe{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:560px){
+  .land{gap:44px}
+  .lfeat,.lfam,.lsteps{grid-template-columns:1fr}
+  .lsteps{gap:26px}
+  .lcta .lbtn{flex:1 1 100%;justify-content:center}
+  .lkids .phone{max-width:150px}
+  .lsafe{grid-template-columns:1fr}
+  .lart{max-width:290px}
+  .lfeat .lcard{display:grid;grid-template-columns:54px minmax(0,1fr);column-gap:14px;row-gap:4px;align-items:start}
+  .lfeat .lic{grid-row:span 2}
+  .lfam{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+  .lfam .lcard{padding:14px 8px;border-radius:22px}
+  .lfam .lav{width:58px;height:58px;font-size:32px}
+  .lfam .lcard p{font-size:13.5px;line-height:1.6}
+}
+.lkids-txt .ltag{align-self:flex-start}
 </style>
 <link rel="stylesheet" href="css/diary.css">
 
@@ -484,6 +582,143 @@ textarea.copybox{width:100%;min-height:160px;border:1px solid var(--line);border
     <a class="tab" href="#diary" data-tab="diary"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4.5A1.5 1.5 0 0 1 6.5 3H19v15H6.5A1.5 1.5 0 0 0 5 19.5zM5 19.5A1.5 1.5 0 0 0 6.5 21H19v-3M12 13.5s-3-1.8-3-3.9a1.6 1.6 0 0 1 3-.8 1.6 1.6 0 0 1 3 .8c0 2.1-3 3.9-3 3.9z" /></svg><span>دفترنا</span></a>
     <a class="tab" href="#tips" data-tab="tips"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9V16h7v-2.1A6 6 0 0 0 12 3z" /></svg><span>نصائح</span></a>
   </nav>
+
+  <main class="land" id="landView" aria-label="ضيفنا الجديد">
+    <section class="lhero">
+      <div class="lhero-txt">
+        <div class="lbrand"><svg width="36" height="36" viewBox="0 0 44 44" aria-hidden="true"><rect width="44" height="44" rx="13" fill="var(--accent)"/><path d="M22 33.5s-10.5-6.4-10.5-13.6A5.9 5.9 0 0 1 22 16.6a5.9 5.9 0 0 1 10.5 3.3c0 7.2-10.5 13.6-10.5 13.6z" fill="#fff"/></svg>من تطبيقات صحتي</div>
+        <h1>ضيفنا الجديد<span>نتابع الحمل معًا كعائلة</span></h1>
+        <p class="llede">رفيق العائلة كلها في رحلة الحمل، من أول يوم إلى يوم اللقاء: ترتّب فيه ماما أدويتها ومهام يومها، ويتابع بابا معها من جواله، ويرى الأطفال كيف يكبر ضيفنا كل أسبوع.</p>
+        <div class="lcta">
+          <button class="lbtn main" id="lStart" type="button">ابدئي الآن 💗</button>
+          <button class="lbtn alt" id="lAcct" type="button">ادخلوا بحساب العائلة</button>
+        </div>
+        <div class="lsub">
+          <button class="pbtn" id="lJoin" type="button">عندي رمز انضمام من العائلة</button>
+          <button class="pbtn" id="lKids" type="button">🧒 واجهة الأطفال</button>
+        </div>
+        <p class="lnote">🔒 يعمل دون إنترنت، وبياناتك تبقى في جهازك حتى تربطيه بالعائلة.</p>
+      </div>
+      <svg class="lart" viewBox="0 0 480 430" role="img" aria-label="عائلة تنتظر ضيفها الجديد: بابا وماما وطفلهما، وفوقهم قلب فيه طفل نائم">
+        <circle cx="240" cy="210" r="196" fill="#fff" opacity=".55"/>
+        <ellipse cx="240" cy="408" rx="214" ry="22" fill="#fbc0d8"/>
+        <g fill="#ffd166"><path class="tw" d="M70 120l4 11 11 4-11 4-4 11-4-11-11-4 11-4z"/><path class="tw2" d="M402 92l3 9 9 3-9 3-3 9-3-9-9-3 9-3z"/><path class="tw2" d="M96 236l3 8 8 3-8 3-3 8-3-8-8-3 8-3z"/></g>
+        <g fill="#ff8fb5"><path class="tw" d="M392 200c-6-4-12-8-12-13a5 5 0 0 1 12-3 5 5 0 0 1 12 3c0 5-6 9-12 13z"/><path class="tw2" d="M66 316c-5-3-10-7-10-11a4 4 0 0 1 10-2 4 4 0 0 1 10 2c0 4-5 8-10 11z"/></g>
+        <g class="bob">
+          <g transform="translate(127 -18) scale(.44)">
+            <path d="M256 478C118 392 46 312 46 210a105 105 0 0 1 210-38 105 105 0 0 1 210 38c0 102-72 182-210 268z" fill="#ff8fb5" stroke="#cc3a76" stroke-width="12" stroke-linejoin="round"/>
+            <path d="M150 168a62 62 0 0 1 70-34" fill="none" stroke="#ffd3e4" stroke-width="14" stroke-linecap="round"/>
+            <ellipse cx="256" cy="352" rx="104" ry="72" fill="#fff6fa" stroke="#f5a9c8" stroke-width="8"/>
+            <path d="M170 336q86 40 172 0" fill="none" stroke="#f5a9c8" stroke-width="7" stroke-linecap="round"/>
+            <circle cx="256" cy="268" r="74" fill="#ffe6c7" stroke="#b97f63" stroke-width="7"/>
+            <path d="M240 197q10-26 34-12q-14 2-12 16" fill="none" stroke="#b97f63" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M214 266q14 12 28 0M270 266q14 12 28 0" fill="none" stroke="#4a2b45" stroke-width="7" stroke-linecap="round"/>
+            <ellipse cx="208" cy="292" rx="15" ry="10" fill="#ffb9d0"/><ellipse cx="304" cy="292" rx="15" ry="10" fill="#ffb9d0"/>
+            <path d="M246 302q10 8 20 0" fill="none" stroke="#c75b6e" stroke-width="6" stroke-linecap="round"/>
+          </g>
+        </g>
+        <!-- بابا -->
+        <path d="M93 404V320q0-34 37-34t37 34v84z" fill="#8cbbe9" stroke="#3e6f9e" stroke-width="5" stroke-linejoin="round"/>
+        <path d="M118 290l12 16 12-16" fill="none" stroke="#3e6f9e" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M160 322q30 20 58 34" fill="none" stroke="#3e6f9e" stroke-width="17" stroke-linecap="round"/><path d="M160 322q30 20 58 34" fill="none" stroke="#8cbbe9" stroke-width="9" stroke-linecap="round"/>
+        <circle cx="130" cy="252" r="31" fill="#f6d2b3" stroke="#b97f63" stroke-width="5"/>
+        <path d="M100 248q2-32 30-32t30 30q-12-14-30-13q-18 0-30 15z" fill="#4a2b45"/>
+        <path d="M116 255q5 5 10 0M134 255q5 5 10 0M122 266q8 7 16 0" fill="none" stroke="#4a2b45" stroke-width="4" stroke-linecap="round"/>
+        <ellipse cx="110" cy="264" rx="6" ry="4" fill="#ffb9d0"/><ellipse cx="150" cy="264" rx="6" ry="4" fill="#ffb9d0"/>
+        <!-- ماما -->
+        <path d="M298 404q4-74 16-100q26-14 52 0q12 26 16 100z" fill="#ff9fc0" stroke="#cc3a76" stroke-width="5" stroke-linejoin="round"/>
+        <ellipse cx="340" cy="356" rx="28" ry="26" fill="#ffb8d1"/>
+        <path d="M340 364c-6-4-11-8-11-12a5 5 0 0 1 11-3 5 5 0 0 1 11 3c0 4-5 8-11 12z" fill="#fff"/>
+        <path d="M320 322q-30 20-58 34" fill="none" stroke="#cc3a76" stroke-width="17" stroke-linecap="round"/><path d="M320 322q-30 20-58 34" fill="none" stroke="#ff9fc0" stroke-width="9" stroke-linecap="round"/>
+        <path d="M300 258a40 42 0 1 1 80 0v28q0 14-14 16h-52q-14-2-14-16z" fill="#c9a0ea" stroke="#8a5bb0" stroke-width="5" stroke-linejoin="round"/>
+        <circle cx="340" cy="256" r="25" fill="#f6d2b3" stroke="#b97f63" stroke-width="4"/>
+        <path d="M327 257q5 5 10 0M343 257q5 5 10 0M332 267q8 7 16 0" fill="none" stroke="#4a2b45" stroke-width="4" stroke-linecap="round"/>
+        <ellipse cx="322" cy="266" rx="5" ry="3.5" fill="#ffb9d0"/><ellipse cx="358" cy="266" rx="5" ry="3.5" fill="#ffb9d0"/>
+        <!-- الطفل -->
+        <path d="M211 404v-40q0-22 24-22t24 22v40z" fill="#ffd166" stroke="#c9962a" stroke-width="4" stroke-linejoin="round"/>
+        <circle cx="216" cy="356" r="8" fill="#f6d2b3" stroke="#b97f63" stroke-width="3"/><circle cx="254" cy="356" r="8" fill="#f6d2b3" stroke="#b97f63" stroke-width="3"/>
+        <circle cx="235" cy="318" r="23" fill="#f6d2b3" stroke="#b97f63" stroke-width="4"/>
+        <path d="M212 316q2-24 23-24t23 22q-10-9-23-9q-13 0-23 11z" fill="#6b3f2a"/>
+        <path d="M225 320q4 4 8 0M238 320q4 4 8 0M230 329q5 5 10 0" fill="none" stroke="#4a2b45" stroke-width="3.5" stroke-linecap="round"/>
+        <ellipse cx="220" cy="328" rx="4.5" ry="3" fill="#ffb9d0"/><ellipse cx="250" cy="328" rx="4.5" ry="3" fill="#ffb9d0"/>
+      </svg>
+    </section>
+
+    <section>
+      <div class="lsec-h"><span class="ltag">جولة في التطبيق</span><h2>كل ما تحتاجه العائلة في مكان واحد</h2><p>لقطات حقيقية من التطبيق على الجوال.</p></div>
+      <div class="lshow">
+        <figure class="lshot"><div class="phone"><img src="images/landing/today.webp" alt="صفحة اليوم: مهام الأدوية منجزة باسم من قام بها" width="390" height="760" loading="lazy"></div><figcaption><b>يومك مرتّب</b><span>الأدوية والطعام والماء والمواعيد في قائمة واحدة</span></figcaption></figure>
+        <figure class="lshot"><div class="phone"><img src="images/landing/meds.webp" alt="ميزان مكملات الحمل: الأدوية المختارة والتنبيهات" width="390" height="760" loading="lazy"></div><figcaption><b>ميزان المكملات</b><span>يكشف الجرعات الزائدة والتكرار والتعارض فورًا</span></figcaption></figure>
+        <figure class="lshot"><div class="phone"><img src="images/landing/months.webp" alt="شهرًا بشهر: العناصر المطلوبة في الشهر السادس" width="390" height="760" loading="lazy"></div><figcaption><b>شهرًا بشهر</b><span>ما تحتاجينه كل شهر ومقارنته بصيدليتك</span></figcaption></figure>
+        <figure class="lshot"><div class="phone"><img src="images/landing/diary.webp" alt="دفتر ذكرياتنا: صفحة لكل شهر من الحمل" width="390" height="760" loading="lazy"></div><figcaption><b>دفتر ذكرياتنا</b><span>صفحة لكل شهر تكتب فيها العائلة مشاعرها</span></figcaption></figure>
+      </div>
+    </section>
+
+    <section>
+      <div class="lsec-h"><span class="ltag">الميزات</span><h2>رحلة الحمل أسهل وأجمل</h2></div>
+      <div class="lfeat">
+        <div class="lcard"><span class="lic" aria-hidden="true">📋</span><h3>صفحة اليوم</h3><p>مهام الأدوية والطعام والماء، والمواعيد القادمة خلال 3 أسابيع، وسجل يُظهر من قام بكل مهمة، وعدّاد للالتزام بالأدوية.</p></div>
+        <div class="lcard"><span class="lic" aria-hidden="true">⚖️</span><h3>ميزان مكملات الحمل</h3><p>يجمع الجرعة اليومية لكل مادة ويقارنها بالحد الأقصى للحامل، وينبّه إلى التكرار والتعارض، ويقترح جدولًا يوميًا.</p></div>
+        <div class="lcard"><span class="lic" aria-hidden="true">🍎</span><h3>شهرًا بشهر</h3><p>العناصر التي يحتاجها كل شهر وهل تأخذينها، مع خارطة طعام وقائمة بما يُتجنب.</p></div>
+        <div class="lcard"><span class="lic" aria-hidden="true">📅</span><h3>حاسبة موعد الولادة</h3><p>من آخر دورة أو تاريخ الإخصاب أو السونار، مع المحطات المهمة وجدول الأسابيع الأربعين.</p></div>
+        <div class="lcard"><span class="lic" aria-hidden="true">🤲</span><h3>الدعاء والذكر</h3><p>دعاء يتغيّر كل يوم، وأذكار الصباح والمساء، وورد القرآن، وأدعية الحمل والذرية بمصادرها.</p></div>
+        <div class="lcard"><span class="lic" aria-hidden="true">📔</span><h3>دفتر ذكرياتنا</h3><p>كل فرد يكتب مشاعره مع صورة للذكرى، ثم يجتمع كله في كتاب يُحفظ PDF أو يُطبع.</p></div>
+      </div>
+    </section>
+
+    <section class="lkids">
+      <div class="phones">
+        <div class="phone"><img src="images/landing/kids.webp" alt="واجهة الأطفال: قلب فيه طفل نائم وعدّاد الأيام حتى اللقاء" width="390" height="760" loading="lazy"></div>
+        <div class="phone"><img src="images/landing/kids2.webp" alt="واجهة الأطفال: دواء ماما وأكواب الماء اليوم" width="390" height="760" loading="lazy"></div>
+      </div>
+      <div class="lkids-txt">
+        <span class="ltag">للأطفال 🧒</span>
+        <h2>الأطفال ينتظرون معنا</h2>
+        <p>واجهة ملوّنة بلغة يفهمها الصغار، على أجهزتهم أو على جوال ماما وبابا.</p>
+        <ul class="lchecks">
+          <li><i aria-hidden="true">💗</i>كيف صار ضيفنا الجديد؟ رسمة تكبر كل أسبوع، وحجمه بفاكهة</li>
+          <li><i aria-hidden="true">⏳</i>عدّاد الأيام: كم يومًا ونلتقي بإذن الله</li>
+          <li><i aria-hidden="true">💧</i>كم كوب ماء شربت ماما، وهل أخذت دواءها، ليذكّروها بلطف</li>
+          <li><i aria-hidden="true">💌</i>زر «أرسل قلبًا لماما» يصل إلى جوالها</li>
+        </ul>
+      </div>
+    </section>
+
+    <section>
+      <div class="lsec-h"><span class="ltag">حساب العائلة</span><h2>كل فرد يرى ما يخصه</h2><p>تربطون أجهزة العائلة برمز QR أو رابط، وتتزامن البيانات أولًا بأول.</p></div>
+      <div class="lfam">
+        <div class="lcard"><span class="lav" aria-hidden="true">🤰</span><h3>ماما</h3><p>كل شيء: الأدوية والمهام والمواعيد والنتائج.</p></div>
+        <div class="lcard"><span class="lav" aria-hidden="true">👨</span><h3>بابا</h3><p>يتابع من جواله ويساعد في المهام، ويظهر اسمه في السجل.</p></div>
+        <div class="lcard"><span class="lav" aria-hidden="true">🧒</span><h3>الأطفال</h3><p>واجهتهم الخاصة، دون أسماء الأدوية أو أي بيانات صحية.</p></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="lsec-h"><span class="ltag">البداية</span><h2>ثلاث خطوات فقط</h2></div>
+      <div class="lsteps">
+        <div class="lcard"><h3>أدخلي تاريخ الحمل</h3><p>من آخر دورة أو السونار، فيُحسب موعد اللقاء وأسبوعك اليوم.</p></div>
+        <div class="lcard"><h3>أضيفي أدويتك</h3><p>يرتّب التطبيق يومك وينبّهك إلى ما يحتاج سؤال الطبيب.</p></div>
+        <div class="lcard"><h3>اربطي العائلة</h3><p>برمز QR يدخل بابا والأطفال، كلٌّ إلى واجهته.</p></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="lsec-h"><span class="ltag">الخصوصية</span><h2>بياناتك في أمان</h2></div>
+      <div class="lsafe">
+        <div><em aria-hidden="true">📴</em><b>يعمل دون إنترنت</b><span>افتحيه في أي وقت ومن أي مكان.</span></div>
+        <div><em aria-hidden="true">📱</em><b>دون حساب إن شئتِ</b><span>تبقى البيانات في جهازك، وتنتقل إلى حساب العائلة عند الربط.</span></div>
+        <div><em aria-hidden="true">🔐</em><b>لأولياء الأمر فقط</b><span>البيانات الصحية لا تصل إلى أجهزة الأطفال.</span></div>
+        <div><em aria-hidden="true">✂️</em><b>أنتم تتحكمون</b><span>تفصلون أي جهاز عن العائلة بلمسة، فيخرج فورًا.</span></div>
+      </div>
+    </section>
+
+    <section class="lend">
+      <h2>ننتظر ضيفنا الجديد معًا 💗</h2>
+      <p>ابدئي الآن على هذا الجهاز، أو ادخلوا بحساب العائلة لتتابعوا معًا.</p>
+      <div class="lcta"><button class="lbtn main" id="lStart2" type="button">ابدئي الآن</button><button class="lbtn alt" id="lAcct2" type="button">حساب العائلة</button></div>
+    </section>
+    <p class="lfoot">ضيفنا الجديد أداة توعوية لا تغني عن الطبيب. لا توقفي دواءً موصوفًا ولا تغيّري جرعته دون الرجوع إلى طبيبك.</p>
+  </main>
 
   <section class="kidv" id="kidView" aria-label="واجهة الأطفال">
     <div class="kcard khero">
@@ -1647,23 +1882,28 @@ function adultAccess(){
   return false;
 }
 const isKidMode=()=>Cloud.status==='kid'||kidFlag||!adultAccess();
+// صفحة الهبوط: لمن لم يسجّل الدخول ولم يختر المتابعة دون حساب. جهاز الطفل يذهب إلى واجهته مباشرة،
+// وزر «واجهة الأطفال» في الصفحة يفتحها (kidPeek) مع زر رجوع.
+var kidPeek=false;
+const isLanding=()=>!kidPeek&&!kidFlag&&Cloud.status!=='kid'&&role()!=='kid'&&!adultAccess();
 function kidLmp(){
   if(Cloud.status==='kid') return kidsDoc&&typeof kidsDoc.lmp==='number'?kidsDoc.lmp:null;
   if(!adultAccess()) return null;
   return dueState.example?null:lmpFrom();
 }
 function applyKidMode(){
-  const was=document.body.classList.contains('kidmode'), on=isKidMode();
-  document.body.classList.toggle('kidmode',on);
+  const B=document.body.classList, was=B.contains('kidmode'), wasL=B.contains('landing'), land=isLanding(), on=isKidMode()&&!land;
+  B.toggle('kidmode',on); B.toggle('landing',land);
   if(on){ renderKids(); if(!was) window.scrollTo(0,0); }
-  return was!==on;
+  if(land&&!wasL) window.scrollTo(0,0);
+  return was!==on||wasL!==land;
 }
 function renderKids(){
   if(!document.body.classList.contains('kidmode')) return;
   const L=kidLmp(), st=Cloud.status, name=(st==='kid'&&Cloud.who)?Cloud.who:'';
   $('kHi').textContent= name?`أهلًا يا ${name}!`:'أهلًا يا بطل!';
   $('kExit').hidden= st==='kid';
-  $('kExit').textContent= kidFlag ? 'خروج من وضع الأطفال' : 'ماما أو بابا؟ ادخلوا من هنا';
+  $('kExit').textContent= kidFlag ? 'خروج من وضع الأطفال' : kidPeek ? 'رجوع إلى الصفحة الرئيسية' : 'ماما أو بابا؟ ادخلوا من هنا';
   const has=L!=null; $('kCount').hidden=!has; $('kNoData').hidden=has;
   if(!has){
     $('kTitle').textContent='ضيفنا الجديد في الطريق!';
@@ -1735,7 +1975,12 @@ $('kDuaBtn').onclick=async()=>{
   out.textContent='وصل دعاؤك لماما، وغدًا دعاء جديد 🤲'; mark();
 };
 $('kidBtn').onclick=()=>{ kidFlag=true; try{localStorage.setItem(KEY+'-kidmode','1')}catch(e){} applyKidMode(); };
-$('kExit').onclick=()=>{ if(kidFlag){ kidFlag=false; try{localStorage.removeItem(KEY+'-kidmode')}catch(e){} applyKidMode(); if(!isKidMode()){ route(); renderToday(); } } else openAcct(); };
+$('kExit').onclick=()=>{ if(kidFlag){ kidFlag=false; try{localStorage.removeItem(KEY+'-kidmode')}catch(e){} applyKidMode(); if(!isKidMode()){ route(); renderToday(); } } else if(kidPeek){ kidPeek=false; applyKidMode(); } else openAcct(); };
+// أزرار صفحة الهبوط
+const landStart=()=>{ try{localStorage.setItem(KEY+'-role','mom')}catch(e){} applyKidMode(); route(); renderToday(); maybeWelcome(); };
+$('lStart').onclick=landStart; $('lStart2').onclick=landStart;
+$('lAcct').onclick=()=>openAcct(); $('lAcct2').onclick=()=>openAcct(); $('lJoin').onclick=()=>openAcct();
+$('lKids').onclick=()=>{ kidPeek=true; applyKidMode(); };
 $('kJoin').onclick=()=>openAcct();
 $('kDiary').onclick=()=>Diary.openKid();
 function publishKidsMaybe(){

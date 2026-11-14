@@ -411,6 +411,21 @@ body.kidmode{padding-bottom:32px!important}
 .dev small{display:block;color:var(--muted);font-size:12px;line-height:1.5}
 .dcut{padding:5px 10px;font-size:13px;color:var(--bad);border-color:var(--bad-soft)}
 .dcut.arm{background:var(--bad);color:#fff;border-color:var(--bad)}
+.sbody{display:flex;flex-direction:column;gap:10px}
+.sname{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--muted)}
+.sname input{border:1px solid var(--line);border-radius:10px;padding:9px 11px;background:#fff;font-size:15px;color:var(--ink)}
+.pairbtns{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.pbox{border:2px dashed var(--accent);border-radius:18px;padding:16px;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;background:#fff}
+.pbox .qr{width:200px;max-width:70vw;background:#fff;border-radius:12px;padding:6px}
+.pbox .qr svg{width:100%;height:auto;display:block}
+.pbox .pcode{font-size:30px;font-weight:800;letter-spacing:.12em;direction:ltr;color:var(--deep);font-variant-numeric:tabular-nums}
+.pbox .plink{font-size:12px;color:var(--muted);direction:ltr;word-break:break-all;user-select:all}
+.pbox .ptime{font-weight:700;color:var(--accent)}
+.pbox .pdone{font-size:18px;font-weight:800;color:var(--ok)}
+.setbtn{text-decoration:none}
+body.kidmode .setbtn{display:none!important}
+.scan-box{display:flex;flex-direction:column;gap:6px}
+.scan-box video{width:100%;max-height:300px;border-radius:18px;background:#000;object-fit:cover}
 textarea.copybox{width:100%;min-height:160px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink);font:inherit;font-size:13px;padding:8px}
 </style>
 
@@ -429,7 +444,7 @@ textarea.copybox{width:100%;min-height:160px;border:1px solid var(--line);border
       <svg class="logo" width="44" height="44" viewBox="0 0 44 44" aria-hidden="true"><rect width="44" height="44" rx="13" fill="var(--accent)"/><path d="M22 33.5s-10.5-6.4-10.5-13.6A5.9 5.9 0 0 1 22 16.6a5.9 5.9 0 0 1 10.5 3.3c0 7.2-10.5 13.6-10.5 13.6z" fill="#fff"/></svg>
       <div><h1>ضيفنا الجديد</h1><p class="lede">متابعة الحمل للعائلة: موعد الولادة، والأدوية، والطعام شهرًا بشهر.</p></div>
     </div>
-    <div class="hbtns"><button class="acct kidbtn" id="kidBtn" type="button"><span aria-hidden="true">🧒</span><span>للأطفال</span></button>
+    <div class="hbtns"><a class="acct setbtn" id="setBtn" href="#settings"><span aria-hidden="true">⚙️</span><span>الإعدادات</span></a><button class="acct kidbtn" id="kidBtn" type="button"><span aria-hidden="true">🧒</span><span>للأطفال</span></button>
     <button class="acct" id="acctBtn" type="button"><i class="dot" id="acctDot"></i><span id="acctTxt">حساب العائلة</span></button></div>
   </header>
 
@@ -630,6 +645,23 @@ textarea.copybox{width:100%;min-height:160px;border:1px solid var(--line);border
     </div>
   </section>
 
+  <section class="view narrow" id="v-settings" hidden>
+    <div class="panel-head"><h2 style="font-size:24px">⚙️ الإعدادات</h2><a class="pbtn" href="#today">رجوع إلى اليوم</a></div>
+    <div class="panel"><h3>الحساب</h3><div id="sAccount" class="sbody"></div></div>
+    <div class="panel" id="sAddP">
+      <div class="panel-head"><h3>إضافة جهاز</h3><span class="hint">رمز صالح لعشر دقائق</span></div>
+      <div id="sAdd" class="sbody">
+        <label class="sname">اسم صاحب الجهاز<input id="pName" maxlength="40" placeholder="مثل: أم محمد، أو محمد"></label>
+        <div class="pairbtns"><button class="btn primary" type="button" data-pair="guardian">👤 جهاز ولي أمر</button><button class="btn primary" type="button" data-pair="kid">🧒 جهاز طفل</button></div>
+        <p class="hint">ولي الأمر يرى كل شيء ويضيف الأجهزة. جهاز الطفل يرى واجهة الأطفال فقط.</p>
+        <div id="pBox" class="pbox" hidden></div>
+      </div>
+    </div>
+    <div class="panel" id="sDevP"><div id="sDevices" class="sbody"></div></div>
+    <div class="panel"><div id="sLook" class="sbody"></div></div>
+    <div class="panel"><h3>واجهة الأطفال</h3><p class="hint">افتحوها على هذا الجوال ثم أعطوه للأطفال، ويخرج منها بزر في أسفلها.</p><button class="btn" type="button" id="sKids">🧒 فتح واجهة الأطفال</button></div>
+  </section>
+
   <section class="view narrow" id="v-tips" hidden>
     <section class="panel">
       <div class="panel-head"><h2>أدعية للحمل والذرية</h2><span class="hint">من القرآن والسنة الصحيحة</span></div>
@@ -676,7 +708,7 @@ textarea.copybox{width:100%;min-height:160px;border:1px solid var(--line);border
       <div class="wheart" aria-hidden="true">🎈</div>
       <h2>أهلًا يا بطل!</h2>
       <p style="font-size:15px">ماما وبابا ينتظران ضيفًا جديدًا 💗 وقريبًا تكون لك صفحة خاصة ترى فيها كيف يكبر في بطن ماما كل أسبوع.</p>
-      <p class="hint" id="wKidHint">اطلب من بابا أو ماما رمز الانضمام من مجلس العائلة.</p>
+      <p class="hint" id="wKidHint">اطلب من بابا أو ماما رمز الانضمام.</p>
       <div class="btns cbtns"><button type="button" class="btn primary" id="wKidCode">عندي رمز</button><button type="button" class="btn" id="wKidOk">حسنًا</button></div>
       <button type="button" class="pbtn" data-wback id="wKidBack">رجوع</button>
     </div>
@@ -723,6 +755,7 @@ textarea.copybox{width:100%;min-height:160px;border:1px solid var(--line);border
   <figure><figcaption><span id="vCap"></span><button class="btn" id="vClose" type="button">إغلاق</button></figcaption><div id="vBody"></div></figure>
 </div>
 
+<script src="js/vendor/qrcode.js"></script>
 <script src="js/cloud.js"></script>
 <script>
 const N = {
@@ -1242,7 +1275,7 @@ function devicesHtml(){
     <span class="dmain"><b>${esc(d.name||'بلا اسم')}${d.me?' (أنت)':''}</b><small>${d.guardian?'ولي أمر':'جهاز طفل'}${d.apps.length?' · '+d.apps.map(a=>APP_NAMES[a]||a).join('، '):''}${d.at?' · منذ '+new Date(d.at).toLocaleDateString('ar-SY-u-nu-latn',{day:'numeric',month:'short',year:'numeric'}):''}</small></span>
     ${d.me?'':`<button class="btn dcut" type="button" data-cut="${d.id}">فصل</button>`}</li>`).join('');
   return head+`<ul class="devs">${owner}${items||'<li class="hint">لا توجد أجهزة أخرى مرتبطة بعد.</li>'}</ul>
-    <p class="hint">الفصل يفصل الجهاز عن تطبيقات العائلة كلها، ويحتاج رمزًا جديدًا من مجلس العائلة للعودة.</p>`;
+    <p class="hint">الفصل يفصل الجهاز عن تطبيقات العائلة كلها، ويحتاج رمزًا جديدًا للعودة.</p>`;
 }
 const ACCT_TXT={local:'محفوظ في هذا الجهاز',loading:'جارٍ الاتصال…',linking:'جارٍ الربط…',out:'حساب العائلة',ok:'محفوظ في حساب العائلة',offline:'بلا اتصال، يُحفظ لاحقًا',kid:'جهاز طفل'};
 const JOIN_ERR={'bad-code':'الرمز 8 أحرف أو أرقام، تأكدي منه.',expired:'الرمز غير صحيح أو انتهت صلاحيته (عشر دقائق). اطلبي رمزًا جديدًا.',network:'تعذّر الاتصال، تأكدي من الإنترنت ثم أعيدي المحاولة.','signed-in':'هذا الجهاز داخل بحساب Google بالفعل.',unavailable:'الاتصال بحساب العائلة غير متاح الآن.'};
@@ -1252,26 +1285,28 @@ function renderAcct(){
   if($('acct').hidden) return;
   const b=$('aBody');
   if(st==='out'){
-    const keep={code:($('jCode')||{}).value||b.dataset.code||'',name:($('jName')||{}).value||''};
-    b.innerHTML=`<p>احفظي بيانات الحمل في حساب العائلة نفسه المستخدم في مجلس العائلة، فتظهر على جوال الأب والأم معًا. أجهزة الأطفال لا ترى البيانات الطبية.</p>
+    const keep={code:($('jCode')||{}).value||b.dataset.code||'',name:($('jName')||{}).value||b.dataset.name||''};
+    b.innerHTML=`<p>احفظوا بيانات الحمل في حساب العائلة، فتظهر على جوال الأب والأم معًا. أجهزة الأطفال لا ترى البيانات الطبية.</p>
       <button class="btn primary big" id="gBtn" type="button">دخول ولي الأمر بحساب Google</button>
       <div class="or">أو</div>
       <form class="dform" id="joinForm">
-        <label>رمز الانضمام من مجلس العائلة<input id="jCode" maxlength="9" autocomplete="off" placeholder="7KQ2M9XP" value="${esc(keep.code)}"></label>
+        ${camOk()?`<button class="btn primary big" id="scanBtn" type="button">📷 امسح رمز QR</button>
+        <div id="scanBox" class="scan-box" hidden><video id="scanVideo" playsinline muted></video><p class="hint">وجّهوا الكاميرا نحو الرمز</p></div>`:''}
+        <label>رمز الانضمام<input id="jCode" maxlength="9" autocomplete="off" placeholder="7KQ2M9XP" value="${esc(keep.code)}"></label>
         <label>اسمك<input id="jName" maxlength="40" placeholder="مثل أم محمد" value="${esc(keep.name)}"></label>
         <p class="werr" id="jErr" hidden></p>
         <button class="btn primary" type="submit">انضمام</button>
-        <p class="hint">من مجلس العائلة على جوال ولي الأمر: «العائلة» ← «أضف فرداً» ← «ولي أمر آخر»، ثم اكتبي الرمز هنا.</p>
+        <p class="hint">من «ضيفنا الجديد» على جوال ولي الأمر: «⚙️ الإعدادات» ← «إضافة جهاز»، ثم اكتبوا الرمز هنا، أو امسحوا رمز QR بكاميرا الجوال.</p>
       </form>
       ${adultAccess()?'':`<div class="or">أو</div><button class="btn" id="localBtn" type="button">متابعة دون حساب على هذا الجهاز</button><p class="hint">للأم: تُحفظ البيانات في هذا الجهاز فقط، ولا تظهر على جوال الأب.</p>`}`;
   } else if(st==='ok'||st==='offline'){
     b.innerHTML=`<div class="who">✓ متصل بحساب العائلة${Cloud.who?' · '+esc(Cloud.who):''}</div>
       <p>بيانات الحمل والأدوية تُحفظ تلقائيًا وتظهر على أجهزة أولياء الأمر في العائلة.${st==='offline'?' لا يوجد اتصال الآن، وستُحفظ التغييرات حين يعود.':''}</p>
-      <button class="btn" id="outBtn" type="button">خروج من هذا الجهاز</button>
-      ${devicesHtml()}`;
+      <button class="btn primary" id="toSettings" type="button">⚙️ الإعدادات وإدارة الأجهزة</button>
+      <button class="btn" id="outBtn" type="button">خروج من هذا الجهاز</button>`;
   } else if(st==='kid'){
     b.innerHTML=`<p>هذا الجهاز مرتبط بالعائلة كجهاز طفل، فيرى واجهة الأطفال ولا تظهر عليه البيانات الطبية.</p>
-      <p class="hint">للأم أو الأب: اطلبوا من مجلس العائلة رمز «ولي أمر آخر».</p>
+      <p class="hint">للأم أو الأب: اطلبوا من ولي الأمر رمز «ولي أمر» من الإعدادات.</p>
       <button class="btn" id="outBtn" type="button">خروج من هذا الجهاز</button>`;
   } else if(st==='local'){
     b.innerHTML=`<p>بياناتك محفوظة في هذا الجهاز فقط. لحفظها في حساب العائلة افتحي التطبيق من رابطه على الإنترنت وتأكدي من الاتصال.</p>`;
@@ -1279,8 +1314,41 @@ function renderAcct(){
   b.insertAdjacentHTML('beforeend',looksHtml());
 }
 const LOOKS=[['arnooba','عالم أرنوبة','#cc3a76'],['falfoula','عالم فلفولة','#2d8c4c']];
-function looksHtml(){const cur=document.documentElement.dataset.look;return `<div class="panel-head"><h3>المظهر</h3><span class="hint">مثل مجلس العائلة</span></div><div class="looks">${LOOKS.map(([k,l,c])=>`<button type="button" class="look" data-look="${k}" aria-pressed="${cur===k}"><i style="background:${c}"></i>${l}</button>`).join('')}</div>`;}
+function looksHtml(){const cur=document.documentElement.dataset.look;return `<div class="panel-head"><h3>المظهر</h3><span class="hint">عالما الأبطال</span></div><div class="looks">${LOOKS.map(([k,l,c])=>`<button type="button" class="look" data-look="${k}" aria-pressed="${cur===k}"><i style="background:${c}"></i>${l}</button>`).join('')}</div>`;}
 function setLook(k){document.documentElement.dataset.look=k;try{localStorage.setItem('sehatty-look',k)}catch(e){}renderAcct();}
+// مسح رمز QR بالكاميرا، منقول من مجلس العائلة كما هو
+const camOk=()=>!!(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia);
+let scanStream=null;
+function stopScan(){ if(scanStream) scanStream.getTracks().forEach(t=>t.stop()); scanStream=null; }
+function loadScript(src){ return new Promise((ok,fail)=>{ const sc=document.createElement('script'); sc.src=src; sc.onload=ok; sc.onerror=fail; document.head.appendChild(sc); }); }
+const loadJsQR=()=>window.jsQR?Promise.resolve():loadScript('js/vendor/jsQR.js');
+function useScanned(text){
+  const m=String(text||'').match(/join=([0-9A-Z]{8})/i)||String(text||'').match(/^\s*([0-9A-Z]{8})\s*$/i);
+  if(!m||!$('jCode')) return false;
+  $('jCode').value=m[1].toUpperCase();
+  const n=String(text).match(/[&?]n=([^&\s]*)/); if(n&&$('jName')&&!$('jName').value){ try{$('jName').value=decodeURIComponent(n[1]).slice(0,40)}catch(e){} }
+  $('joinForm').requestSubmit(); return true;
+}
+async function startScan(){
+  if(scanStream) return;
+  try{ const [stream]=await Promise.all([navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}}),loadJsQR()]); scanStream=stream; }
+  catch(e){ toast('📷 تعذّر فتح الكاميرا. اكتبوا الرمز بدلًا من ذلك.'); return; }
+  const video=$('scanVideo'); if(!video){ stopScan(); return; }
+  $('scanBox').hidden=false; $('scanBtn').hidden=true;
+  video.srcObject=scanStream; video.play().catch(()=>{});
+  const canvas=document.createElement('canvas'), ctx=canvas.getContext('2d',{willReadFrequently:true});
+  const tick=()=>{
+    if(!scanStream||!document.body.contains(video)||$('acct').hidden){ stopScan(); return; }
+    if(video.readyState>=2&&video.videoWidth){
+      canvas.width=video.videoWidth; canvas.height=video.videoHeight; ctx.drawImage(video,0,0);
+      const img=ctx.getImageData(0,0,canvas.width,canvas.height);
+      const hit=jsQR(img.data,img.width,img.height,{inversionAttempts:'dontInvert'});
+      if(hit&&/join=/i.test(hit.data)){ stopScan(); $('scanBox').hidden=true; $('scanBtn').hidden=false; useScanned(hit.data); return; }
+    }
+    requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+}
 function openAcct(code){ $('acct').hidden=false; if(code) $('aBody').dataset.code=code; renderAcct(); if(code&&$('jCode')) $('jCode').value=code; }
 $('acctBtn').onclick=()=>openAcct();
 $('aClose').onclick=()=>{$('acct').hidden=true; maybeWelcome();};
@@ -1288,6 +1356,7 @@ $('acct').addEventListener('click',e=>{if(e.target.id==='acct'){ $('acct').hidde
 $('wAcct').onclick=()=>{closeWelcome(); openAcct();};
 $('aBody').addEventListener('click',async e=>{
   const lk=e.target.closest('button.look'); if(lk){setLook(lk.dataset.look);return;}
+  if(e.target.id==='scanBtn'){ startScan(); return; }
   if(e.target.id==='gBtn'){
     try{ await Cloud.signIn(); }catch(err){ if(!/popup-closed|cancelled-popup/.test(err.code||'')) toast('تعذّر الدخول بحساب Google'); }
   }
@@ -1303,7 +1372,7 @@ $('aBody').addEventListener('click',async e=>{
 $('aBody').addEventListener('submit',async e=>{
   if(e.target.id!=='joinForm') return; e.preventDefault();
   const btn=e.target.querySelector('button[type=submit]'); btn.disabled=true; $('jErr').hidden=true;
-  try{ await Cloud.join($('jCode').value,$('jName').value); delete $('aBody').dataset.code; toast('تم الانضمام إلى حساب العائلة'); }
+  try{ await Cloud.join($('jCode').value,$('jName').value); delete $('aBody').dataset.code; delete $('aBody').dataset.name; toast('تم الانضمام إلى حساب العائلة'); }
   catch(err){ const m=JOIN_ERR[err.message]||'تعذّر الانضمام. أعيدي المحاولة.'; if($('jErr')){$('jErr').textContent=m;$('jErr').hidden=false;} }
   finally{ if(btn.isConnected) btn.disabled=false; }
 });
@@ -1520,7 +1589,7 @@ function renderKids(){
   if(!has){
     $('kTitle').textContent='ضيفنا الجديد في الطريق!';
     $('kFact').textContent='ماما وبابا ينتظران ضيفًا جديدًا 💗';
-    $('kNoTxt').textContent= st==='kid' ? 'لم يُضف ماما وبابا موعد الضيف الجديد بعد. اطلب منهما أن يضيفاه في التطبيق.' : 'اطلب من بابا أو ماما رمز الانضمام من مجلس العائلة، لترى كيف يكبر ضيفنا كل أسبوع.';
+    $('kNoTxt').textContent= st==='kid' ? 'لم يُضف ماما وبابا موعد الضيف الجديد بعد. اطلب منهما أن يضيفاه في التطبيق.' : 'اطلب من بابا أو ماما رمز الانضمام، لترى كيف يكبر ضيفنا كل أسبوع.';
     $('kJoin').hidden= st==='kid'||st==='ok'||st==='offline';
     $('kBaby').style.transform='scale(.55)';
   } else {
@@ -1571,12 +1640,79 @@ Cloud.on((what,x)=>{
   if(what==='data') setTimeout(publishKidsMaybe,0);
 });
 
-const TABS=['today','pregnancy','months','meds','tips'];
+/* ===== الإعدادات: الحساب وإضافة جهاز والأجهزة المرتبطة ===== */
+var PAIR=null, pairTimer=null;
+function renderSettings(){
+  if(!$('sAccount')) return;
+  const live=Cloud.live&&['ok','offline'].includes(Cloud.status);
+  $('setBtn').hidden=!adultAccess();
+  $('sAccount').innerHTML = live
+    ? `<div class="who">✓ متصل بحساب العائلة${Cloud.who?' · '+esc(Cloud.who):''}</div><p class="hint">${Cloud.owner?'صاحب الحساب (دخول بحساب Google).':'ولي أمر انضم برمز.'} البيانات تُحفظ وتظهر على أجهزة أولياء الأمر.</p><button class="btn" id="sOut" type="button">خروج من هذا الجهاز</button>`
+    : `<p>تعملين دون حساب: البيانات في هذا الجهاز فقط، ولا تظهر على جوال الأب.</p><button class="btn primary" id="sLink" type="button">ربط بحساب العائلة</button>`;
+  $('sAddP').hidden=!live; $('sDevP').hidden=!live;
+  if(live) $('sDevices').innerHTML=devicesHtml();
+  $('sLook').innerHTML=looksHtml();
+  renderPair();
+}
+function pairLink(code,name){ return location.origin+location.pathname+'#join='+code+(name?'&n='+encodeURIComponent(name):''); }
+function renderPair(){
+  const box=$('pBox'); if(!box) return;
+  if(!PAIR){ box.hidden=true; box.innerHTML=''; clearInterval(pairTimer); pairTimer=null; return; }
+  box.hidden=false;
+  const joined=(DEVICES||[]).find(d=>d.code===PAIR.code);
+  if(joined){ box.innerHTML=`<div class="pdone">✓ انضم جهاز ${esc(joined.name||PAIR.name||'')}</div><p class="hint">${joined.guardian?'ولي أمر':'جهاز طفل'} · يظهر الآن في الأجهزة المرتبطة.</p><button class="btn" type="button" id="pClose">تم</button>`; clearInterval(pairTimer); pairTimer=null; return; }
+  const left=Math.max(0,Math.round((PAIR.exp-Date.now())/1000));
+  if(!left){ box.innerHTML=`<p>انتهت صلاحية الرمز.</p><button class="btn primary" type="button" data-pair="${PAIR.type}">رمز جديد</button>`; clearInterval(pairTimer); pairTimer=null; return; }
+  if(!box.querySelector('.pcode')){
+    let svg=''; try{ const q=qrcode(0,'M'); q.addData(PAIR.link); q.make(); svg=q.createSvgTag({cellSize:4,margin:2,scalable:true}); }catch(e){}
+    box.innerHTML=`<b>${PAIR.type==='guardian'?'👤 جهاز ولي أمر':'🧒 جهاز طفل'}${PAIR.name?' · '+esc(PAIR.name):''}</b>
+      ${svg?`<div class="qr" aria-label="رمز QR للانضمام">${svg}</div>`:''}
+      <p class="hint">امسحوا الرمز بكاميرا الجوال الآخر، أو أرسلوا له الرابط، أو اكتبوا الرمز في «حساب العائلة».</p>
+      <div class="pcode">${PAIR.code.slice(0,4)} ${PAIR.code.slice(4)}</div>
+      <div class="plink" id="pLink">${esc(PAIR.link)}</div>
+      <div class="btns cbtns"><button class="btn primary" type="button" id="pCopy">نسخ الرابط</button><button class="btn" type="button" id="pCancel">إلغاء الرمز</button></div>
+      <span class="ptime" id="pTime"></span>`;
+  }
+  const t=$('pTime'); if(t) t.textContent=`صالح لمدة ${Math.floor(left/60)}:${String(left%60).padStart(2,'0')}`;
+  if(!pairTimer) pairTimer=setInterval(renderPair,1000);
+}
+document.addEventListener('click',async e=>{
+  const pb=e.target.closest('[data-pair]');
+  if(pb){
+    const type=pb.dataset.pair, name=($('pName').value||'').trim().slice(0,40);
+    if(type==='guardian'&&!name){ toast('اكتبوا اسم ولي الأمر أولًا'); $('pName').focus(); return; }
+    pb.disabled=true;
+    try{ const r=await Cloud.createCode(type==='guardian'?'A|'+name:''); PAIR={...r,type,name,link:pairLink(r.code,name)}; $('pBox').innerHTML=''; renderPair(); }
+    catch(err){ toast('تعذّر إنشاء الرمز، تأكدوا من الاتصال'); }
+    finally{ pb.disabled=false; }
+    return;
+  }
+  if(e.target.id==='pCopy'){ const t=PAIR&&PAIR.link; if(!t) return;
+    try{ await navigator.clipboard.writeText(t); toast('نُسخ الرابط، أرسلوه للجهاز الآخر'); }
+    catch(err){ const r=document.createRange(); r.selectNodeContents($('pLink')); const s=getSelection(); s.removeAllRanges(); s.addRange(r); toast('حدّدوا الرابط وانسخوه'); } return; }
+  if(e.target.id==='pCancel'){ if(PAIR) Cloud.cancelCode(PAIR.code); PAIR=null; renderPair(); return; }
+  if(e.target.id==='pClose'){ PAIR=null; $('pName').value=''; renderPair(); return; }
+  if(e.target.id==='sOut'){ e.target.disabled=true; try{localStorage.removeItem(KEY+'-role');localStorage.removeItem(KEY+'-parent')}catch(err){} await Cloud.signOut().catch(()=>{}); cloudReady=false; toast('خرج هذا الجهاز من حساب العائلة'); return; }
+  if(e.target.id==='sLink'){ openAcct(); return; }
+  if(e.target.id==='sKids'){ $('kidBtn').click(); return; }
+  if(e.target.id==='toSettings'){ $('acct').hidden=true; location.hash='settings'; return; }
+  const lk=e.target.closest('#sLook button.look'); if(lk){ setLook(lk.dataset.look); renderSettings(); return; }
+  const cut=e.target.closest('#sDevices [data-cut]');
+  if(cut){
+    if(!cut.classList.contains('arm')){ cut.classList.add('arm'); cut.textContent='تأكيد الفصل'; setTimeout(()=>{ if(cut.isConnected){ cut.classList.remove('arm'); cut.textContent='فصل'; } },4000); return; }
+    cut.disabled=true; cut.textContent='يُفصل…';
+    const ok=await Cloud.removeDevice(cut.dataset.cut); toast(ok?'فُصل الجهاز عن العائلة':'تعذّر الفصل، أعيدوا المحاولة'); if(!ok) renderSettings();
+  }
+});
+Cloud.on(what=>{ if(what==='devices'){ if(!$('sDevP').hidden) $('sDevices').innerHTML=devicesHtml(); renderPair(); } else if(what==='status') renderSettings(); });
+
+const TABS=['today','pregnancy','months','meds','tips','settings'];
 function route(){
   const jm=(location.hash||'').match(/join=([0-9A-Z]{8})/i);
-  if(jm){ history.replaceState(null,'',location.pathname+location.search); openAcct(jm[1].toUpperCase()); }
+  if(jm){ const nm=(location.hash.match(/[&?]n=([^&]*)/)||[])[1]; history.replaceState(null,'',location.pathname+location.search); if(nm){ try{$('aBody').dataset.name=decodeURIComponent(nm).slice(0,40)}catch(e){} } openAcct(jm[1].toUpperCase()); }
   let t=jm?'today':(location.hash||'').slice(1); const toRes=t==='result'; if(toRes) t='meds'; if(!TABS.includes(t)) t='today';
   TABS.forEach(k=>{$('v-'+k).hidden=k!==t;});
+  if(t==='settings') renderSettings();
   document.querySelectorAll('.tab').forEach(a=>{if(a.dataset.tab===t) a.setAttribute('aria-current','page'); else a.removeAttribute('aria-current');});
   window.scrollTo(0,0);
   if(toRes) $('resultTop').scrollIntoView({block:'start'});

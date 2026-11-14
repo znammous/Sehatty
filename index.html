@@ -1651,7 +1651,7 @@ function renderKids(){
   if(ms){
     $('kPills').innerHTML=Array.from({length:ms.t},(_,i)=>`<i class="${i<ms.d?'done':''}"></i>`).join('');
     const all=ms.d>=ms.t; $('kMeds').classList.toggle('late',!all&&ms.d===0);
-    $('kMedsTxt').textContent= all ? 'ماما أخذت كل أدويتها اليوم 👏' : ms.d===0 ? 'ماما لم تأخذ دواءها بعد اليوم. ذكّرها! 💊' : `ماما أخذت ${ms.d} من ${ms.t} حبات.`;
+    $('kMedsTxt').textContent= all ? 'ماما أخذت كل أدويتها اليوم 👏' : ms.d===0 ? 'ماما لم تأخذ دواءها اليوم 💊' : `ماما أخذت ${ms.d} من ${ms.t} حبات.`;
     $('kMedsNext').textContent= !all&&ms.n ? `الحبة التالية: ${ms.n}. ذكّرها بلطف! 💗` : '';
   }
   // أكواب ماء ماما اليوم: من جوال الوالدين مباشرة، أو مما ينشرونه لأجهزة الأطفال

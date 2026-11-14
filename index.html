@@ -1,6 +1,6 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ميزان مكملات الحمل</title>
+<title>صحتي للحامل</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=Readex+Pro:wght@500;700&display=swap">
@@ -121,6 +121,7 @@ details.add summary{cursor:pointer;font-weight:600;color:var(--accent)}
   .row.head{display:none}
   .row .mcell{grid-column:1/-1}
   .row .tot{order:0}
+  .row .pill{grid-column:1/-1;justify-self:start}
 }
 .other{font-size:12.5px;color:var(--muted)}
 
@@ -174,7 +175,20 @@ footer{color:var(--muted);font-size:12.5px;max-width:80ch;line-height:1.7}
 .prog i{position:absolute;inset-block:0;inset-inline-start:0;background:var(--accent);border-radius:5px}
 .prog-cap{display:flex;justify-content:space-between;font-size:11.5px;color:var(--muted);margin-top:4px}
 .tbl-wrap{overflow-x:auto}
-table.ms{width:100%;border-collapse:collapse;font-size:13.5px;min-width:520px}
+table.ms{width:100%;border-collapse:collapse;font-size:13.5px}
+table.ms.wide{min-width:520px}
+@media (max-width:640px){
+  .tbl-wrap.cards{overflow:visible}
+  table.ms.wide{min-width:0}
+  table.ms.wide thead{display:none}
+  table.ms.wide,table.ms.wide tbody{display:block}
+  table.ms.wide tr{display:grid;grid-template-columns:auto minmax(0,1fr);gap:2px 12px;padding:10px 12px;border-bottom:1px solid var(--line)}
+  table.ms.wide td{display:block;padding:0;border:0;background:none!important;box-shadow:none!important}
+  table.ms.wide td:nth-child(2){font-size:12.5px;color:var(--muted);align-self:center}
+  table.ms.wide td:nth-child(3),table.ms.wide td:nth-child(4){grid-column:1/-1}
+  table.ms.wide td:nth-child(4):not(:empty)::before{content:"المكملات: ";font-weight:600;color:var(--accent)}
+  table.ms.wide tr.now{background:var(--accent-soft);border-radius:10px;box-shadow:inset -4px 0 0 var(--accent)}
+}
 table.ms th{font-size:12px;color:var(--muted);font-weight:600;text-align:start;padding:6px 8px;border-bottom:1px solid var(--line)}
 table.ms td{padding:8px;border-bottom:1px solid var(--line);vertical-align:top}
 table.ms tr.past td{color:var(--muted)}
@@ -184,25 +198,49 @@ table.ms .wk{white-space:nowrap;font-weight:600}
 table.ms .sup{font-size:12.5px;color:var(--muted)}
 .tag{display:inline-block;font-size:11px;border-radius:20px;padding:0 8px;margin-inline-start:6px;background:var(--accent);color:var(--surface);font-weight:600;vertical-align:middle}
 details.weeks summary{cursor:pointer;font-weight:600;color:var(--accent)}
+.viewer figure.welcome{padding:20px;gap:12px}
+.werr{color:var(--bad);font-size:13px}
+.tabs{display:flex;gap:4px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:4px}
+.tab{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:9px 10px;border-radius:9px;color:var(--muted);text-decoration:none;font-weight:600;position:relative}
+.tab:hover{color:var(--ink)}
+.tab[aria-current="page"]{background:var(--accent);color:var(--surface)}
+.tbadge{min-width:20px;height:20px;border-radius:10px;background:var(--bad);color:#fff;font-size:11.5px;display:inline-flex;align-items:center;justify-content:center;padding:0 6px;font-variant-numeric:tabular-nums}
+.view{display:flex;flex-direction:column;gap:18px;min-width:0}
+.view.narrow{max-width:860px;width:100%;margin-inline:auto}
+.intro{color:var(--muted);font-size:14.5px;margin:0}
+.next{justify-content:flex-end}
+.next .btn{text-decoration:none;padding:10px 18px}
+@media (max-width:700px){
+  .tabs{position:fixed;inset-inline:0;bottom:0;z-index:15;border-radius:0;border-inline:0;border-bottom:0;gap:0;
+    padding:6px max(8px,env(safe-area-inset-right,0px)) calc(6px + env(safe-area-inset-bottom,0px)) max(8px,env(safe-area-inset-left,0px));box-shadow:0 -4px 16px rgba(0,0,0,.08)}
+  .tab{flex-direction:column;gap:2px;font-size:12px;padding:6px 4px}
+  .tab .tbadge{position:absolute;top:2px;inset-inline-end:calc(50% - 26px)}
+  body{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
+  .toast{bottom:calc(84px + env(safe-area-inset-bottom,0px))}
+  header.top .lede{font-size:13.5px}
+}
 textarea.copybox{width:100%;min-height:160px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);font:inherit;font-size:13px;padding:8px}
 </style>
 
 <div class="wrap">
   <header class="top">
-    <div>
-      <div class="brand">
-        <svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true"><rect x="1" y="1" width="38" height="38" rx="10" fill="var(--accent-soft)"/><path d="M20 9v20M11 14h18M11 14l-4 9h8zM29 14l-4 9h8zM14 31h12" stroke="var(--accent)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        <h1>ميزان مكملات الحمل</h1>
-      </div>
-      <p class="lede">اختاري ما تأخذينه من فيتامينات وأدوية، فيجمع الميزان الجرعة اليومية لكل مادة ويقارنها بالحد الأقصى المسموح للحامل. وينبّهك إلى التكرار والتعارض، ويرتّب لك جدولًا يوميًا. وفيها حاسبة لموعد الولادة ومحطات الحمل المهمة.</p>
-    </div>
-    <div class="btns">
-      <button class="btn primary" id="copyBtn" type="button">نسخ الملخص لإرساله للطبيب</button>
+    <div class="brand">
+      <svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true"><rect x="1" y="1" width="38" height="38" rx="10" fill="var(--accent-soft)"/><path d="M20 9v20M11 14h18M11 14l-4 9h8zM29 14l-4 9h8zM14 31h12" stroke="var(--accent)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <div><h1>صحتي للحامل</h1><p class="lede">موعد ولادتك، وأدويتك ومكملاتها، في مكان واحد.</p></div>
     </div>
   </header>
 
+  <nav class="tabs" aria-label="أقسام التطبيق">
+    <a class="tab" href="#pregnancy" data-tab="pregnancy"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16v14H4zM4 10h16M8 3v4M16 3v4" /></svg><span>حملي</span></a>
+    <a class="tab" href="#meds" data-tab="meds"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 15.5l7-7a3.5 3.5 0 0 0-5-5l-7 7a3.5 3.5 0 0 0 5 5zM7 9l5 5" /></svg><span>أدويتي</span></a>
+    <a class="tab" href="#result" data-tab="result"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l4 4 10-10" /></svg><span>النتيجة</span><b class="tbadge" id="tBadge" hidden></b></a>
+    <a class="tab" href="#tips" data-tab="tips"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9V16h7v-2.1A6 6 0 0 0 12 3z" /></svg><span>نصائح</span></a>
+  </nav>
+
+  <section class="view" id="v-pregnancy">
+    <p class="intro">احسبي موعد ولادتك، واعرفي متى يحين كل فحص مهم.</p>
   <section class="panel" id="dueBox">
-    <div class="panel-head"><h2>حاسبة موعد الولادة</h2><span class="hint" id="dueHint"></span></div>
+    <div class="panel-head"><h2>موعد الولادة</h2><span class="hint" id="dueHint"></span></div>
     <div class="due">
       <form class="dform" id="dueForm">
         <label>طريقة الحساب<select id="d_method">
@@ -224,20 +262,20 @@ textarea.copybox{width:100%;min-height:160px;border:1px solid var(--line);border
       </div>
     </div>
     <h3>المحطات المهمة في حملك</h3>
-    <div class="tbl-wrap"><table class="ms"><thead><tr><th>الأسبوع</th><th>التاريخ</th><th>ماذا يحدث</th><th>ما يخص المكملات</th></tr></thead><tbody id="msBody"></tbody></table></div>
+    <div class="tbl-wrap cards"><table class="ms wide"><thead><tr><th>الأسبوع</th><th>التاريخ</th><th>ماذا يحدث</th><th>ما يخص المكملات</th></tr></thead><tbody id="msBody"></tbody></table></div>
     <details class="weeks"><summary>جدول الأسابيع الأربعين كاملًا</summary>
       <div class="tbl-wrap" style="margin-top:10px"><table class="ms"><thead><tr><th>الأسبوع</th><th>يبدأ في</th><th>ينتهي في</th><th>الثلث</th></tr></thead><tbody id="wkBody"></tbody></table></div>
     </details>
   </section>
+  </section>
 
+  <section class="view narrow" id="v-meds" hidden>
+    <p class="intro">علّمي على كل ما تأخذينه وحدّدي عدد الحبات في اليوم. ثم انتقلي إلى «النتيجة».</p>
   <div class="notice" id="exampleNote">
     <span><b>مثال محمّل:</b> صندوق حقيقي لحامل فيه 7 أصناف. امسحيه وابدئي بقائمتك.</span>
     <span class="btns"><button class="btn" id="clearBtn" type="button">مسح الاختيار</button><button class="btn" id="exampleBtn" type="button">إعادة المثال</button></span>
   </div>
-
-  <div class="grid">
-    <section class="col">
-      <div class="panel">
+    <div class="panel">
         <div class="panel-head"><h2>ماذا تأخذين؟</h2><span class="hint">حدّدي العدد اليومي لكل صنف</span></div>
         <div id="picker" style="display:flex;flex-direction:column;gap:8px"></div>
         <details class="add" id="addBox">
@@ -267,33 +305,33 @@ textarea.copybox{width:100%;min-height:160px;border:1px solid var(--line);border
           </form>
         </details>
       </div>
-    </section>
+    <div class="btns next"><a class="btn primary" href="#result">عرض النتيجة</a></div>
+  </section>
 
-    <section class="col">
+  <section class="view narrow" id="v-result" hidden>
+    <p class="intro">مرتّبة من الأهم: التنبيهات، ثم ما يكفي منه صنف واحد، ثم جدولك اليومي، ثم تفاصيل كل مادة.</p>
       <div class="panel">
-        <div class="panel-head"><h2>النتيجة</h2><span class="hint" id="countHint"></span></div>
+        <div class="panel-head" id="resultTop"><h2>النتيجة</h2><span class="hint" id="countHint"></span></div>
         <div class="verdict" id="verdict"></div>
         <div class="alerts" id="alerts"></div>
+        <div class="btns"><button class="btn primary" id="copyBtn" type="button">نسخ الملخص لإرساله للطبيب</button></div>
       </div>
-
       <div class="panel">
         <div class="panel-head"><h2>أصناف لها الغرض نفسه</h2><span class="hint">قارني بينها واختاري واحدًا مع طبيبك</span></div>
         <div id="compare" style="display:flex;flex-direction:column;gap:12px"></div>
       </div>
-
+      <div class="panel">
+        <div class="panel-head"><h2>الجدول اليومي المقترح</h2><span class="hint">يُعرض على الطبيب قبل الالتزام به</span></div>
+        <div class="sched" id="sched"></div>
+      </div>
       <div class="panel">
         <div class="panel-head"><h2>المجموع اليومي مقابل الحد الأقصى</h2><span class="hint">الخط الرمادي = الاحتياج اليومي للحامل</span></div>
         <div class="rows" id="rows"></div>
         <p class="other" id="other"></p>
       </div>
+  </section>
 
-      <div class="panel">
-        <div class="panel-head"><h2>الجدول اليومي المقترح</h2><span class="hint">يُعرض على الطبيب قبل الالتزام به</span></div>
-        <div class="sched" id="sched"></div>
-      </div>
-    </section>
-  </div>
-
+  <section class="view narrow" id="v-tips" hidden>
   <section class="panel">
     <h2>قواعد ثابتة تفيد كل حامل</h2>
     <div class="tips">
@@ -303,12 +341,36 @@ textarea.copybox{width:100%;min-height:160px;border:1px solid var(--line);border
       <div><b>متى تراجعين الطبيب فورًا</b>إمساك شديد أو قيء مستمر بعد الحديد، أو براز أسود مع دوخة، أو هبوط في السكر (رجفة وتعرق) مع أدوية السكري.</div>
     </div>
   </section>
+  </section>
 
   <footer>
     هذه الصفحة أداة توعوية. الحدود المستخدمة هي الحدود العليا اليومية المعتمدة للحامل البالغة (معاهد الصحة الأمريكية NIH، ومنظمة الصحة العالمية للحديد العلاجي). وقد يصف الطبيب جرعة أعلى لسبب يعرفه، مثل فقر الدم أو الحمل عالي الخطورة. لا توقفي دواءً موصوفًا ولا تغيّري جرعته دون الرجوع إلى طبيبك.
   </footer>
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div class="viewer" id="welcome" hidden role="dialog" aria-modal="true" aria-labelledby="wTitle">
+  <figure class="welcome">
+    <h2 id="wTitle">أهلًا بك</h2>
+    <p class="hint" style="font-size:14px">لنحسب موعد ولادتك ونرتّب محطات حملك، أدخلي تاريخ الحمل. يبقى التاريخ في جهازك فقط.</p>
+    <form class="dform" id="wForm">
+      <label>أعرف تاريخ<select id="w_method">
+        <option value="lmp">أول يوم من آخر دورة</option>
+        <option value="conc">الإخصاب</option>
+        <option value="us">السونار وعمر الحمل فيه</option>
+      </select></label>
+      <label><span id="w_dateLabel">أول يوم من آخر دورة</span><input id="w_date" type="date" required></label>
+      <div class="pair" id="w_us" hidden>
+        <label>عمر الحمل: أسابيع<input id="w_usw" type="number" min="4" max="40" value="8"></label>
+        <label>وأيام<input id="w_usd" type="number" min="0" max="6" value="0"></label>
+      </div>
+      <p class="werr" id="wErr" hidden></p>
+      <div class="btns" style="justify-content:space-between">
+        <button class="btn primary" type="submit">احسبي موعدي</button>
+        <button class="btn" type="button" id="wSkip">لاحقًا</button>
+      </div>
+    </form>
+  </figure>
+</div>
 <div class="viewer" id="viewer" hidden role="dialog" aria-modal="true" aria-label="معاينة العلبة">
   <figure><figcaption><span id="vCap"></span><button class="btn" id="vClose" type="button">إغلاق</button></figcaption><div id="vBody"></div></figure>
 </div>
@@ -458,6 +520,7 @@ function render(){
   const units=Object.values(state.sel).reduce((a,b)=>a+(b||0),0);
   const c={bad:A.filter(a=>a.lv==='bad').length,warn:A.filter(a=>a.lv==='warn').length,info:A.filter(a=>a.lv==='info').length};
   $('countHint').textContent=nSel?`${nSel} أصناف · ${units} حبة يوميًا`:'';
+  const tb=$('tBadge'); tb.hidden=!(c.bad+c.warn); tb.textContent=c.bad+c.warn; tb.title='تنبيهات تحتاج انتباهًا';
   $('verdict').innerHTML=`
     <div class="tile${c.bad?' bad':''}"><b class="num">${c.bad}</b><span>تجاوز أو تكرار خطير</span></div>
     <div class="tile${c.warn?' warn':''}"><b class="num">${c.warn}</b><span>يحتاج انتباهًا</span></div>
@@ -560,6 +623,7 @@ const MS=[
 ];
 let dueState={method:'lmp',date:'',cycle:28,usw:8,usd:0};
 try{const d=JSON.parse(localStorage.getItem(KEY+'-due')||'null'); if(d) dueState={...dueState,...d};}catch(e){}
+const firstVisit=!dueState.date;
 if(!dueState.date){dueState.date=isoD(todayU()-(10*7+3)*DAY); dueState.example=true;}
 function lmpFrom(){
   const t=parseD(dueState.date); if(t==null) return null;
@@ -604,6 +668,27 @@ $('dueForm').addEventListener('input',()=>{
 });
 $('dueForm').addEventListener('submit',e=>e.preventDefault());
 renderDue();
+/* نافذة أول دخول */
+const wSync=()=>{const m=$('w_method').value; $('w_us').hidden=m!=='us'; $('w_dateLabel').textContent={lmp:'أول يوم من آخر دورة',conc:'تاريخ الإخصاب',us:'تاريخ السونار'}[m];};
+$('w_method').addEventListener('change',wSync);
+$('w_date').max=isoD(todayU());
+const closeWelcome=()=>{$('welcome').hidden=true; try{localStorage.setItem(KEY+'-welcomed','1')}catch(e){}};
+$('wSkip').onclick=closeWelcome;
+$('wForm').addEventListener('submit',e=>{
+  e.preventDefault();
+  const m=$('w_method').value, t=parseD($('w_date').value);
+  const err=msg=>{$('wErr').textContent=msg;$('wErr').hidden=false;};
+  if(t==null) return err('اختاري التاريخ أولًا.');
+  if(t>todayU()) return err('التاريخ في المستقبل، تأكدي منه.');
+  const ga=m==='us'?(t-((+$('w_usw').value||0)*7+(+$('w_usd').value||0))*DAY):(m==='conc'?t-14*DAY:t);
+  if((todayU()-ga)/DAY>44*7) return err('هذا التاريخ أقدم من 44 أسبوعًا، تأكدي منه.');
+  dueState={method:m,date:$('w_date').value,cycle:28,usw:$('w_usw').value,usd:$('w_usd').value};
+  try{localStorage.setItem(KEY+'-due',JSON.stringify(dueState))}catch(e){}
+  closeWelcome(); renderDue(); toast('حُسب موعدك');
+  location.hash='pregnancy'; route();
+});
+let welcomed=false; try{welcomed=localStorage.getItem(KEY+'-welcomed')==='1'}catch(e){}
+if(firstVisit&&!welcomed){$('welcome').hidden=false; setTimeout(()=>$('w_date').focus(),50);}
 
 function openView(id){
   const p=byId(id); if(!p) return; const src=imgOf(p);
@@ -614,7 +699,7 @@ function openView(id){
 const closeView=()=>{$('viewer').hidden=true;};
 $('vClose').onclick=closeView;
 $('viewer').addEventListener('click',e=>{if(e.target.id==='viewer') closeView();});
-document.addEventListener('keydown',e=>{if(e.key==='Escape') closeView();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeView(); if(!$('welcome').hidden) closeWelcome();}});
 document.addEventListener('click',e=>{
   const v=e.target.closest('[data-view]'); if(v){openView(v.dataset.view);return;}
   const k=e.target.closest('[data-keep]');
@@ -652,5 +737,13 @@ $('addForm').addEventListener('submit',async e=>{
   state.custom.push({id,name,sub:'صنف مضاف',form:'حبة',cat:$('f_cat').value,def:units,c,img,why:'صنف أضفتِه من علبته.'});
   state.sel[id]=units; e.target.reset(); $('addBox').open=false; render(); toast('أُضيف الصنف');
 });
-render();
+const TABS=['pregnancy','meds','result','tips'];
+function route(){
+  let t=(location.hash||'').slice(1); if(!TABS.includes(t)) t='pregnancy';
+  TABS.forEach(k=>{$('v-'+k).hidden=k!==t;});
+  document.querySelectorAll('.tab').forEach(a=>{if(a.dataset.tab===t) a.setAttribute('aria-current','page'); else a.removeAttribute('aria-current');});
+  window.scrollTo(0,0);
+}
+window.addEventListener('hashchange',route);
+render(); route();
 </script>

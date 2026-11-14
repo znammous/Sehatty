@@ -18,6 +18,7 @@ const Cloud = (() => {
   const OTHER_APPS = { familyChat: 'family-chat-family', jungleHero: 'jungle-hero-family', spellingHero: 'spelling-hero-family' };
   const FID_KEY = 'sehatty-family';
   const NOLINK = 'sehatty-nolink';
+  const ONAME = 'sehatty-owner-name';   // «معرّف|الاسم»: اسم صاحب الحساب محفوظًا في الجهاز حتى يصل من السحابة
   const ls = {
     get: k => { try { return localStorage.getItem(k); } catch (e) { return null; } },
     set: (k, v) => { try { v ? localStorage.setItem(k, v) : localStorage.removeItem(k); } catch (e) {} },
@@ -63,12 +64,13 @@ const Cloud = (() => {
   function stopAll() {
     if (dataUnsub) { dataUnsub(); dataUnsub = null; }
     extraUnsubs.forEach(u => u()); extraUnsubs = [];
-    memberData = null; parent = false; guardName = ''; ownerName = '';
+    memberData = null; parent = false; guardName = '';
   }
 
   async function onUser(u) {
     if (joining && u && u.isAnonymous && !ls.get(FID_KEY)) { user = u; return; }
     stopAll();
+    if (!u || u.isAnonymous || u.uid !== (user && user.uid)) ownerName = '';
     user = u;
     fid = !u ? null : u.isAnonymous ? ls.get(FID_KEY) : u.uid;
     if (u && u.isAnonymous && !fid && ls.get(NOLINK) !== '1') {
@@ -138,7 +140,8 @@ const Cloud = (() => {
     // اسم صاحب الحساب في التطبيق (بدل اسم حساب Google أو بريده) في sehatty/owner
     if (!user.isAnonymous) extraUnsubs.push(fs.onSnapshot(famDoc('sehatty', 'owner'), snap => {
       const n = (snap.exists() && snap.data().name) || '';
-      if (n !== ownerName) { ownerName = n; notify('name'); }
+      if (snap.metadata.fromCache && !n) return;
+      if (n !== ownerName) { ownerName = n; ls.set(ONAME, n ? user.uid + '|' + n : null); notify('name'); }
     }, () => {}));
     extraUnsubs.push(fs.onSnapshot(famCol('sehattyAppts'), snap => {
       notify('appts', { list: snap.docs.map(d => ({ id: d.id, ...d.data() })), fromCache: snap.metadata.fromCache });
@@ -325,14 +328,17 @@ const Cloud = (() => {
     const p = user.isAnonymous
       ? fb.fs.updateDoc(famDoc('guardians', user.uid), { name: n })
       : fb.fs.setDoc(famDoc('sehatty', 'owner'), { name: n }, { merge: true });
-    if (user.isAnonymous) guardName = n; else ownerName = n;
+    if (user.isAnonymous) guardName = n; else { ownerName = n; ls.set(ONAME, user.uid + '|' + n); }
     notify('name');
     return p.then(() => true).catch(() => false);
   }
 
   function who() {
     if (!user) return '';
-    if (!user.isAnonymous) return ownerName || user.displayName || user.email || 'ولي الأمر';
+    if (!user.isAnonymous) {
+      const c = ls.get(ONAME) || '', cached = c.startsWith(user.uid + '|') ? c.slice(user.uid.length + 1) : '';
+      return ownerName || cached || user.displayName || user.email || 'ولي الأمر';
+    }
     return guardName || (memberData && memberData.name) || '';
   }
 

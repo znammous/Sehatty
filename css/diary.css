@@ -111,3 +111,4 @@ body.dy-open{overflow:hidden}
   body.dy-printing .dy-ph img{max-height:120mm;object-fit:contain}
 }
 .toast{z-index:40}
+.kdbtn{font-size:19px;padding:14px 26px;margin-top:4px}

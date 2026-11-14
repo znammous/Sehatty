@@ -219,6 +219,15 @@ details.weeks summary{cursor:pointer;font-weight:600;color:var(--accent)}
   .toast{bottom:calc(84px + env(safe-area-inset-bottom,0px))}
   header.top .lede{font-size:13.5px}
 }
+.rescol{position:sticky;top:16px;max-height:calc(100vh - 32px);overflow-y:auto;overscroll-behavior:contain;padding-inline-end:2px}
+.grid .col>.notice{margin:0}
+.mstrip{display:none}
+@media (max-width:900px){
+  .rescol{position:static;max-height:none;overflow:visible}
+  .mstrip{display:flex;position:sticky;top:env(safe-area-inset-top,0px);z-index:12;gap:8px;align-items:center;justify-content:space-between;
+    background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:8px 10px;box-shadow:0 4px 14px rgba(0,0,0,.06)}
+  .mstrip .cnt{display:flex;gap:6px;flex-wrap:wrap}
+}
 textarea.copybox{width:100%;min-height:160px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);font:inherit;font-size:13px;padding:8px}
 </style>
 
@@ -232,8 +241,7 @@ textarea.copybox{width:100%;min-height:160px;border:1px solid var(--line);border
 
   <nav class="tabs" aria-label="أقسام التطبيق">
     <a class="tab" href="#pregnancy" data-tab="pregnancy"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16v14H4zM4 10h16M8 3v4M16 3v4" /></svg><span>حملي</span></a>
-    <a class="tab" href="#meds" data-tab="meds"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 15.5l7-7a3.5 3.5 0 0 0-5-5l-7 7a3.5 3.5 0 0 0 5 5zM7 9l5 5" /></svg><span>أدويتي</span></a>
-    <a class="tab" href="#result" data-tab="result"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l4 4 10-10" /></svg><span>النتيجة</span><b class="tbadge" id="tBadge" hidden></b></a>
+    <a class="tab" href="#meds" data-tab="meds"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 15.5l7-7a3.5 3.5 0 0 0-5-5l-7 7a3.5 3.5 0 0 0 5 5zM7 9l5 5" /></svg><span>أدويتي ونتيجتها</span><b class="tbadge" id="tBadge" hidden></b></a>
     <a class="tab" href="#tips" data-tab="tips"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9V16h7v-2.1A6 6 0 0 0 12 3z" /></svg><span>نصائح</span></a>
   </nav>
 
@@ -269,8 +277,11 @@ textarea.copybox{width:100%;min-height:160px;border:1px solid var(--line);border
   </section>
   </section>
 
-  <section class="view narrow" id="v-meds" hidden>
-    <p class="intro">علّمي على كل ما تأخذينه وحدّدي عدد الحبات في اليوم. ثم انتقلي إلى «النتيجة».</p>
+  <section class="view" id="v-meds" hidden>
+    <p class="intro">علّمي على كل ما تأخذينه وحدّدي عدد الحبات في اليوم، وتتحدث النتيجة فورًا مع كل تغيير.</p>
+    <div class="mstrip" id="mstrip"><div class="cnt" id="mstripCnt"></div><button class="btn primary" id="mstripGo" type="button">النتيجة ↓</button></div>
+    <div class="grid">
+      <div class="col">
   <div class="notice" id="exampleNote">
     <span><b>مثال محمّل:</b> صندوق حقيقي لحامل فيه 7 أصناف. امسحيه وابدئي بقائمتك.</span>
     <span class="btns"><button class="btn" id="clearBtn" type="button">مسح الاختيار</button><button class="btn" id="exampleBtn" type="button">إعادة المثال</button></span>
@@ -305,11 +316,9 @@ textarea.copybox{width:100%;min-height:160px;border:1px solid var(--line);border
           </form>
         </details>
       </div>
-    <div class="btns next"><a class="btn primary" href="#result">عرض النتيجة</a></div>
-  </section>
+      </div>
+      <div class="col rescol" id="resCol">
 
-  <section class="view narrow" id="v-result" hidden>
-    <p class="intro">مرتّبة من الأهم: التنبيهات، ثم ما يكفي منه صنف واحد، ثم جدولك اليومي، ثم تفاصيل كل مادة.</p>
       <div class="panel">
         <div class="panel-head" id="resultTop"><h2>النتيجة</h2><span class="hint" id="countHint"></span></div>
         <div class="verdict" id="verdict"></div>
@@ -329,6 +338,8 @@ textarea.copybox{width:100%;min-height:160px;border:1px solid var(--line);border
         <div class="rows" id="rows"></div>
         <p class="other" id="other"></p>
       </div>
+      </div>
+    </div>
   </section>
 
   <section class="view narrow" id="v-tips" hidden>
@@ -520,6 +531,8 @@ function render(){
   const units=Object.values(state.sel).reduce((a,b)=>a+(b||0),0);
   const c={bad:A.filter(a=>a.lv==='bad').length,warn:A.filter(a=>a.lv==='warn').length,info:A.filter(a=>a.lv==='info').length};
   $('countHint').textContent=nSel?`${nSel} أصناف · ${units} حبة يوميًا`:'';
+  $('mstripCnt').innerHTML = !nSel ? '<span class="hint">اختاري أصنافك</span>'
+    : (c.bad?`<span class="pill bad">${c.bad} خطير</span>`:'')+(c.warn?`<span class="pill warn">${c.warn} للانتباه</span>`:'')+(!c.bad&&!c.warn?'<span class="pill ok">لا تكرار ولا تجاوز</span>':'')+`<span class="pill none">${units} حبة/يوم</span>`;
   const tb=$('tBadge'); tb.hidden=!(c.bad+c.warn); tb.textContent=c.bad+c.warn; tb.title='تنبيهات تحتاج انتباهًا';
   $('verdict').innerHTML=`
     <div class="tile${c.bad?' bad':''}"><b class="num">${c.bad}</b><span>تجاوز أو تكرار خطير</span></div>
@@ -737,13 +750,15 @@ $('addForm').addEventListener('submit',async e=>{
   state.custom.push({id,name,sub:'صنف مضاف',form:'حبة',cat:$('f_cat').value,def:units,c,img,why:'صنف أضفتِه من علبته.'});
   state.sel[id]=units; e.target.reset(); $('addBox').open=false; render(); toast('أُضيف الصنف');
 });
-const TABS=['pregnancy','meds','result','tips'];
+const TABS=['pregnancy','meds','tips'];
 function route(){
-  let t=(location.hash||'').slice(1); if(!TABS.includes(t)) t='pregnancy';
+  let t=(location.hash||'').slice(1); const toRes=t==='result'; if(toRes) t='meds'; if(!TABS.includes(t)) t='pregnancy';
   TABS.forEach(k=>{$('v-'+k).hidden=k!==t;});
   document.querySelectorAll('.tab').forEach(a=>{if(a.dataset.tab===t) a.setAttribute('aria-current','page'); else a.removeAttribute('aria-current');});
   window.scrollTo(0,0);
+  if(toRes) $('resultTop').scrollIntoView({block:'start'});
 }
+$('mstripGo').onclick=()=>$('resultTop').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'});
 window.addEventListener('hashchange',route);
 render(); route();
 </script>

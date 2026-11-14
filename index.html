@@ -1021,7 +1021,7 @@ $('aClose').onclick=()=>{$('acct').hidden=true;};
 $('acct').addEventListener('click',e=>{if(e.target.id==='acct') $('acct').hidden=true;});
 $('wAcct').onclick=()=>{closeWelcome(); openAcct();};
 $('aBody').addEventListener('click',async e=>{
-  const lk=e.target.closest('[data-look]'); if(lk){setLook(lk.dataset.look);return;}
+  const lk=e.target.closest('button.look'); if(lk){setLook(lk.dataset.look);return;}
   if(e.target.id==='gBtn'){
     try{ await Cloud.signIn(); }catch(err){ if(!/popup-closed|cancelled-popup/.test(err.code||'')) toast('تعذّر الدخول بحساب Google'); }
   }

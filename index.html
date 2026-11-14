@@ -426,6 +426,10 @@ body.kidmode{padding-bottom:32px!important}
 body.kidmode .setbtn{display:none!important}
 .scan-box{display:flex;flex-direction:column;gap:6px}
 .scan-box video{width:100%;max-height:300px;border-radius:18px;background:#000;object-fit:cover}
+.kcups{display:flex;justify-content:center;gap:6px;flex-wrap:wrap;direction:rtl}
+.kcups i{width:32px;height:40px;border:3px solid var(--info);border-top-width:0;border-radius:0 0 11px 11px;background:#fff}
+.kcups i.full{background:linear-gradient(0deg,#9fd3f5 0 80%,#fff 80%)}
+.kwtxt{font-size:18px;font-weight:700}
 textarea.copybox{width:100%;min-height:160px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink);font:inherit;font-size:13px;padding:8px}
 </style>
 <link rel="stylesheet" href="css/diary.css">
@@ -486,6 +490,11 @@ textarea.copybox{width:100%;min-height:160px;border:1px solid var(--line);border
       <div class="kbig" aria-hidden="true">🎈</div>
       <p id="kNoTxt"></p>
       <button class="btn primary" id="kJoin" type="button">عندي رمز من ماما أو بابا</button>
+    </div>
+    <div class="kcard kwater" id="kWater" hidden>
+      <h3>💧 ماء ماما اليوم</h3>
+      <div class="kcups" id="kCups" aria-hidden="true"></div>
+      <p class="kwtxt" id="kWaterTxt"></p>
     </div>
     <div class="kcard">
       <h3>كيف تساعد ماما اليوم؟</h3>
@@ -1489,6 +1498,7 @@ function renderToday(){
   $('tLog').innerHTML = LOGALL.length ? LOGALL.slice(0,40).map(l=>`<li><span class="ic ${l.kind==='appt'?'appt':l.kind==='water'?'water':l.kind==='dua'||l.kind==='heart'?'dua':''}" aria-hidden="true">${l.kind==='appt'?'📅':l.kind==='water'?'💧':l.kind==='dua'?'🤲':l.kind==='heart'?'💗':'✓'}</span><span>${l.by?`<b>${esc(l.by)}</b> · `:''}${esc(l.text)}</span><time>${whenTxt(l.t)}</time></li>`).join('')
     : '<li><span></span><span class="empty">ستظهر هنا كل مهمة تُنجز وكل موعد يُضاف، مع اسم من قام بها.</span><span></span></li>';
   const left=total-nDone; $('todayBadge').hidden=!left; $('todayBadge').textContent=left;
+  if(document.body.classList.contains('kidmode')) try{renderKids()}catch(e){}
 }
 function logLocal(text,kind){ TS.log.unshift({t:Date.now(),by:meName(),text,kind}); TS.log=TS.log.slice(0,100); }
 function medCount(){ return todayTasks().filter(t=>t.med).length; }
@@ -1508,9 +1518,9 @@ async function toggleTask(id,label,on,isMed,apptId){
 function setWater(n){
   const today=dayKey(), day=TS.days[today]||(TS.days[today]={date:today,done:{}});
   const before=day.water||0; day.water=(n===before)?n-1:n;
-  if(tsCloud){ Cloud.setDay(today,{water:day.water}); if(before<8&&day.water>=8) Cloud.addLog('اكتمل شرب 8 أكواب ماء','water'); }
+  if(tsCloud){ Cloud.setDay(today,{water:day.water}); Cloud.publishKids({water:day.water,waterDay:today}); if(before<8&&day.water>=8) Cloud.addLog('اكتمل شرب 8 أكواب ماء','water'); }
   else { if(before<8&&day.water>=8) logLocal('اكتمل شرب 8 أكواب ماء','water'); saveTS(); }
-  renderToday();
+  renderToday(); try{renderKids()}catch(e){}
 }
 // تأكيد قبل التعليم أو إلغائه، حتى لا تتحول المهمة إلى «تمّ» بلمسة غير مقصودة
 let pendingTask=null;
@@ -1613,6 +1623,15 @@ function renderKids(){
     $('kPath').innerHTML=MONTHS.map(x=>`<i class="${x.m<M.m?'past':x.m===M.m?'now':''}">${x.m===M.m?M.fruit:x.m}</i>`).join('');
     $('kMeta').textContent=`نحن في الشهر ${M.m} من 9`;
     $('kBaby').style.transform=`scale(${(0.5+0.5*Math.min(ga/280,1)).toFixed(3)})`;
+  }
+  // أكواب ماء ماما اليوم: من جوال الوالدين مباشرة، أو مما ينشرونه لأجهزة الأطفال
+  let water=null;
+  if(st==='kid'){ if(kidsDoc) water=kidsDoc.waterDay===dayKey()?(kidsDoc.water||0):0; }
+  else if(adultAccess()){ const d=TS.days[dayKey()]; water=(d&&d.water)||0; }
+  $('kWater').hidden= water==null;
+  if(water!=null){
+    $('kCups').innerHTML=Array.from({length:8},(_,i)=>`<i class="${i<water?'full':''}"></i>`).join('');
+    $('kWaterTxt').textContent= water>=8 ? 'أحسنت ماما! شربت كل الأكواب الثمانية 🎉' : water===0 ? 'ماما لم تشرب الماء بعد اليوم. أحضِر لها كوبًا! 💧' : `ماما شربت ${water} من 8 أكواب. ذكّرها بكوب ماء! 💧`;
   }
   const di=dayIndex(); $('kHelp').innerHTML=[0,1,2].map(i=>`<li>${KIDHELP[(di+i*3)%KIDHELP.length]}</li>`).join('');
 }

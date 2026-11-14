@@ -153,10 +153,10 @@ const Cloud = (() => {
     return fb.fs.addDoc(famCol('sehattyLog'), { t: Date.now(), by: by || who(), uid: user.uid, text: String(text).slice(0, 200), kind: kind || '' })
       .then(() => true).catch(() => false);
   }
-  // ولي الأمر ينشر للأطفال موعد الولادة وحده (lmp بالميلي ثانية)
+  // ولي الأمر ينشر للأطفال موعد الولادة (lmp بالميلي ثانية) وعدد أكواب ماء ماما اليوم (water, waterDay)، لا غير
   function publishKids(data) {
     if (!live()) return Promise.resolve(false);
-    return fb.fs.setDoc(famDoc('apps', 'sehattyKids'), { ...data, at: fb.fs.serverTimestamp() }).then(() => true).catch(() => false);
+    return fb.fs.setDoc(famDoc('apps', 'sehattyKids'), { ...data, at: fb.fs.serverTimestamp() }, { merge: true }).then(() => true).catch(() => false);
   }
   // أي جهاز في العائلة (ومنه جهاز الطفل) يرسل قلبًا لماما
   function sendHeart(name) {

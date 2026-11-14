@@ -403,6 +403,7 @@ body.kidmode{padding-bottom:32px!important}
 .fly{position:fixed;font-size:34px;pointer-events:none;z-index:30;animation:fly 1.6s ease-out forwards}
 @keyframes fly{to{transform:translate(var(--dx),-60vh) scale(1.4);opacity:0}}
 @media (prefers-reduced-motion:reduce){.fly{display:none}}
+#wMom [data-wback]{display:none}
 textarea.copybox{width:100%;min-height:160px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink);font:inherit;font-size:13px;padding:8px}
 </style>
 
@@ -1126,13 +1127,12 @@ var welcomed=false; try{welcomed=localStorage.getItem(KEY+'-welcomed')==='1'}cat
 function wShow(step){ ['wWho','wDad','wKid','wMom'].forEach(k=>$(k).hidden=k!==step); $('welcome').hidden=false;
   const f=$(step).querySelector(step==='wMom'?'#w_date':'button'); if(f) setTimeout(()=>f.focus(),50); }
 function maybeWelcome(){
-  if(!firstVisit||welcomed||!$('welcome').hidden) return;
+  if(welcomed||!dueState.example||!$('welcome').hidden) return;
   if(/join=/i.test(location.hash)||!$('acct').hidden) return;
   const st=Cloud.status;
   if(st==='loading'||st==='linking') return;
-  if((st==='ok'||st==='offline')&&!dueState.example) return;
-  if(st==='kid'){ closeWelcome(); applyKidMode(); return; }
-  wShow('wWho');
+  if(typeof adultAccess!=='function'||!adultAccess()) return;   // الأطفال وغير المسجّلين لا يُسألون عن الحمل
+  wShow('wMom');
 }
 $('welcome').addEventListener('click',e=>{
   const r=e.target.closest('[data-role]');
@@ -1243,7 +1243,8 @@ function renderAcct(){
         <p class="werr" id="jErr" hidden></p>
         <button class="btn primary" type="submit">انضمام</button>
         <p class="hint">من مجلس العائلة على جوال ولي الأمر: «العائلة» ← «أضف فرداً» ← «ولي أمر آخر»، ثم اكتبي الرمز هنا.</p>
-      </form>`;
+      </form>
+      ${adultAccess()?'':`<div class="or">أو</div><button class="btn" id="localBtn" type="button">متابعة دون حساب على هذا الجهاز</button><p class="hint">للأم: تُحفظ البيانات في هذا الجهاز فقط، ولا تظهر على جوال الأب.</p>`}`;
   } else if(st==='ok'||st==='offline'){
     b.innerHTML=`<div class="who">✓ متصل بحساب العائلة${Cloud.who?' · '+esc(Cloud.who):''}</div>
       <p>بيانات الحمل والأدوية تُحفظ تلقائيًا وتظهر على أجهزة أولياء الأمر في العائلة.${st==='offline'?' لا يوجد اتصال الآن، وستُحفظ التغييرات حين يعود.':''}</p>
@@ -1262,15 +1263,16 @@ function looksHtml(){const cur=document.documentElement.dataset.look;return `<di
 function setLook(k){document.documentElement.dataset.look=k;try{localStorage.setItem('sehatty-look',k)}catch(e){}renderAcct();}
 function openAcct(code){ $('acct').hidden=false; if(code) $('aBody').dataset.code=code; renderAcct(); if(code&&$('jCode')) $('jCode').value=code; }
 $('acctBtn').onclick=()=>openAcct();
-$('aClose').onclick=()=>{$('acct').hidden=true;};
-$('acct').addEventListener('click',e=>{if(e.target.id==='acct') $('acct').hidden=true;});
+$('aClose').onclick=()=>{$('acct').hidden=true; maybeWelcome();};
+$('acct').addEventListener('click',e=>{if(e.target.id==='acct'){ $('acct').hidden=true; maybeWelcome(); }});
 $('wAcct').onclick=()=>{closeWelcome(); openAcct();};
 $('aBody').addEventListener('click',async e=>{
   const lk=e.target.closest('button.look'); if(lk){setLook(lk.dataset.look);return;}
   if(e.target.id==='gBtn'){
     try{ await Cloud.signIn(); }catch(err){ if(!/popup-closed|cancelled-popup/.test(err.code||'')) toast('تعذّر الدخول بحساب Google'); }
   }
-  if(e.target.id==='outBtn'){ e.target.disabled=true; await Cloud.signOut().catch(()=>{}); cloudReady=false; toast('خرج هذا الجهاز من حساب العائلة'); renderAcct(); }
+  if(e.target.id==='localBtn'){ try{localStorage.setItem(KEY+'-role','mom')}catch(err){} $('acct').hidden=true; applyKidMode(); route(); renderToday(); maybeWelcome(); return; }
+  if(e.target.id==='outBtn'){ e.target.disabled=true; try{localStorage.removeItem(KEY+'-role');localStorage.removeItem(KEY+'-parent')}catch(err){} await Cloud.signOut().catch(()=>{}); cloudReady=false; toast('خرج هذا الجهاز من حساب العائلة'); renderAcct(); }
 });
 $('aBody').addEventListener('submit',async e=>{
   if(e.target.id!=='joinForm') return; e.preventDefault();
@@ -1459,22 +1461,35 @@ try{kidFlag=localStorage.getItem(KEY+'-kidmode')==='1'}catch(e){}
 const KIDFACT={1:'ضيفنا الجديد صغير جدًا الآن، أصغر من حبة سمسم! لكنه بدأ رحلته ليأتي إلينا.',2:'صار له قلب صغير ينبض بسرعة: دُق دُق دُق!',3:'صارت له يدان صغيرتان وأصابع، ويتحرك في بطن ماما.',4:'بدأ يسمع الأصوات. قل له: السلام عليكم يا ضيفنا!',5:'صار يركل ويتقلّب! ماما تشعر بحركته الآن.',6:'يسمع صوتك جيدًا. احكِ له قصة قصيرة قرب بطن ماما.',7:'صار يفتح عينيه ويغمضهما، ويعرف صوت ماما.',8:'ينام كثيرًا ويكبر بسرعة ليصير قويًا.',9:'صار جاهزًا تقريبًا! قريبًا نحمله ونلعب معه.'};
 const KIDHELP=['أحضِر لماما كوب ماء 💧','رتّب ألعابك لتريح ماما 🧸','تكلّم بهدوء حين ترتاح ماما 🤫','أعطِ ماما حضنًا كبيرًا 🤗','ساعد في ترتيب المائدة 🍽️','ضع يدك على بطن ماما وقل له: أحبك 💗','فكّر في اسم تحبه لضيفنا وأخبر ماما وبابا ✨','ادعُ لماما بالصحة وللضيف الجديد 🤲','اقرأ لضيفنا سورة قصيرة بصوت جميل 📖'];
 const role=()=>{try{return localStorage.getItem(KEY+'-role')||''}catch(e){return ''}};
-const isKidMode=()=>Cloud.status==='kid'||role()==='kid'||kidFlag;
+// الافتراضي لمن لم يسجّل الدخول: واجهة الأطفال. التطبيق الكامل لأولياء الأمر المسجّلين،
+// أو لمن اختار «متابعة دون حساب على هذا الجهاز».
+const lastParent=()=>{try{return localStorage.getItem(KEY+'-parent')==='1'}catch(e){return false}};
+function adultAccess(){
+  const st=Cloud.status;
+  if(st==='kid') return false;
+  if(Cloud.live&&(st==='ok'||st==='offline')) return true;
+  if(role()==='mom'||role()==='dad') return true;
+  if((st==='loading'||st==='linking')&&lastParent()) return true;
+  return false;
+}
+const isKidMode=()=>Cloud.status==='kid'||kidFlag||!adultAccess();
 function kidLmp(){
   if(Cloud.status==='kid') return kidsDoc&&typeof kidsDoc.lmp==='number'?kidsDoc.lmp:null;
-  if(role()==='kid'&&!Cloud.live) return null;
+  if(!adultAccess()) return null;
   return dueState.example?null:lmpFrom();
 }
 function applyKidMode(){
-  const on=isKidMode(); document.body.classList.toggle('kidmode',on);
-  if(on){ renderKids(); window.scrollTo(0,0); }
+  const was=document.body.classList.contains('kidmode'), on=isKidMode();
+  document.body.classList.toggle('kidmode',on);
+  if(on){ renderKids(); if(!was) window.scrollTo(0,0); }
+  return was!==on;
 }
 function renderKids(){
   if(!document.body.classList.contains('kidmode')) return;
   const L=kidLmp(), st=Cloud.status, name=(st==='kid'&&Cloud.who)?Cloud.who:'';
   $('kHi').textContent= name?`أهلًا يا ${name}!`:'أهلًا يا بطل!';
   $('kExit').hidden= st==='kid';
-  $('kExit').textContent= role()==='kid'&&!kidFlag ? 'أنا لست طفلًا' : 'خروج من وضع الأطفال';
+  $('kExit').textContent= kidFlag ? 'خروج من وضع الأطفال' : 'ماما أو بابا؟ ادخلوا من هنا';
   const has=L!=null; $('kCount').hidden=!has; $('kNoData').hidden=has;
   if(!has){
     $('kTitle').textContent='ضيفنا الجديد في الطريق!';
@@ -1513,8 +1528,7 @@ $('kHeart').onclick=async()=>{
   $('kSent').textContent='وصل قلبك لماما 💗';
 };
 $('kidBtn').onclick=()=>{ kidFlag=true; try{localStorage.setItem(KEY+'-kidmode','1')}catch(e){} applyKidMode(); };
-$('kExit').onclick=()=>{ if(kidFlag){ kidFlag=false; try{localStorage.removeItem(KEY+'-kidmode')}catch(e){} } else { try{localStorage.removeItem(KEY+'-role')}catch(e){} }
-  applyKidMode(); if(!isKidMode()){ route(); renderToday(); } };
+$('kExit').onclick=()=>{ if(kidFlag){ kidFlag=false; try{localStorage.removeItem(KEY+'-kidmode')}catch(e){} applyKidMode(); if(!isKidMode()){ route(); renderToday(); } } else openAcct(); };
 $('kJoin').onclick=()=>openAcct();
 function publishKidsMaybe(){
   if(!Cloud.live||!['ok','offline'].includes(Cloud.status)||dueState.example) return;
@@ -1522,7 +1536,9 @@ function publishKidsMaybe(){
   lastKidsLmp=L; Cloud.publishKids({lmp:L});
 }
 Cloud.on((what,x)=>{
-  if(what==='status'){ if(!['ok','offline'].includes(Cloud.status)) lastKidsLmp=null; setTimeout(()=>{ publishKidsMaybe(); applyKidMode(); },0); }
+  if(what==='status'){ const st=Cloud.status; if(!['ok','offline'].includes(st)) lastKidsLmp=null;
+    try{ if(Cloud.live&&(st==='ok'||st==='offline')) localStorage.setItem(KEY+'-parent','1'); else if(st==='out'||st==='kid') localStorage.removeItem(KEY+'-parent'); }catch(e){}
+    setTimeout(()=>{ publishKidsMaybe(); if(applyKidMode()&&!isKidMode()) route(); maybeWelcome(); },0); }
   if(what==='kids'){ kidsDoc=x; renderKids(); }
   if(what==='hearts'){ HEARTS=x; renderToday(); }
   if(what==='data') setTimeout(publishKidsMaybe,0);

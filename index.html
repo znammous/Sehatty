@@ -319,7 +319,8 @@ header.top{align-items:center}
 .task .tt small{display:block;font-weight:400;color:var(--muted);font-size:12.5px}
 .task .by{font-size:11.5px;color:var(--ok);white-space:nowrap}
 .task.done{background:var(--ok-soft);border-color:transparent}
-.task.done .tt{text-decoration:line-through;text-decoration-color:var(--muted);color:var(--muted)}
+.task.done .tt{color:var(--muted)}
+.task.done .ttl{text-decoration:line-through;text-decoration-color:var(--muted)}
 .task.late{border-color:var(--bad)}
 .water{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:9px 12px;border:1px solid var(--line);border-radius:12px;background:#fff}
 .water .tt{font-weight:600;flex:1;min-width:120px}
@@ -345,6 +346,14 @@ header.top{align-items:center}
 .log .ic.water{background:var(--info-soft);color:var(--info)}
 .log time{font-size:12px;color:var(--muted);white-space:nowrap}
 .log b{font-weight:700}
+.ayah{display:block;font-size:19px;line-height:1.9;font-weight:600;color:var(--deep);margin:4px 0 2px}
+.task.done .ayah{color:var(--muted)}
+.log .ic.dua{background:var(--accent-soft);color:var(--accent)}
+.duas{display:flex;flex-direction:column;gap:10px}
+.duas div{background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.duas b{display:block;font-size:13.5px;color:var(--muted)}
+.duas .ayah{font-size:20px}
+.duas small{color:var(--muted);font-size:12.5px}
 textarea.copybox{width:100%;min-height:160px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink);font:inherit;font-size:13px;padding:8px}
 </style>
 
@@ -521,6 +530,11 @@ textarea.copybox{width:100%;min-height:160px;border:1px solid var(--line);border
   </section>
 
   <section class="view narrow" id="v-tips" hidden>
+    <section class="panel">
+      <div class="panel-head"><h2>أدعية للحمل والذرية</h2><span class="hint">من القرآن والسنة الصحيحة</span></div>
+      <div class="duas" id="duaList"></div>
+      <p class="hint">«دعاء السيدة مريم» المشهور هو دعاء أمها امرأة عمران وهي حامل بها، كما في الآيتين 35 و36 من سورة آل عمران. ولم يثبت في السنة دعاء خاص بتسهيل الولادة، فيُدعى بالأدعية العامة الصحيحة وبما تيسّر.</p>
+    </section>
   <section class="panel">
     <h2>قواعد ثابتة تفيد كل حامل</h2>
     <div class="tips">
@@ -1141,12 +1155,30 @@ const DAILY_FOOD={1:[['حصة ورقيات أو بقوليات','للفوليك:
   2:[['حصة حديد مع ليمون','لحم، أو عدس، أو سبانخ مع عصير برتقال'],['كوبان من الألبان','لبن، لبنة مبسترة، حليب'],['حفنة جوز أو حصة سمك','لأوميغا 3']],
   3:[['حصة حديد','لحم، عدس، دبس، تمر'],['كوبان من الألبان','لبن، لبنة مبسترة، طحينة'],['ألياف مع كل وجبة','خضار، خبز أسمر، شوفان']]};
 const APPT_KIND={doc:'موعد طبيب',lab:'تحليل',us:'سونار',task:'مهمة'};
+// أدعية ثابتة فقط: آيات من القرآن الكريم، وحديث في صحيح البخاري، ودعاء عام صححه الألباني.
+const DUAS=[
+  {n:'دعاء زكريا عليه السلام',t:'رَبِّ هَبْ لِي مِن لَّدُنكَ ذُرِّيَّةً طَيِّبَةً ۖ إِنَّكَ سَمِيعُ الدُّعَاءِ',src:'سورة آل عمران: 38'},
+  {n:'دعاء امرأة عمران وهي حامل بمريم عليها السلام',t:'رَبِّ إِنِّي نَذَرْتُ لَكَ مَا فِي بَطْنِي مُحَرَّرًا فَتَقَبَّلْ مِنِّي ۖ إِنَّكَ أَنتَ السَّمِيعُ الْعَلِيمُ',src:'سورة آل عمران: 35'},
+  {n:'تعويذ امرأة عمران لمريم وذريتها',t:'وَإِنِّي أُعِيذُهَا بِكَ وَذُرِّيَّتَهَا مِنَ الشَّيْطَانِ الرَّجِيمِ',src:'سورة آل عمران: 36'},
+  {n:'دعاء عباد الرحمن',t:'رَبَّنَا هَبْ لَنَا مِنْ أَزْوَاجِنَا وَذُرِّيَّاتِنَا قُرَّةَ أَعْيُنٍ وَاجْعَلْنَا لِلْمُتَّقِينَ إِمَامًا',src:'سورة الفرقان: 74'},
+  {n:'دعاء إبراهيم عليه السلام',t:'رَبِّ اجْعَلْنِي مُقِيمَ الصَّلَاةِ وَمِن ذُرِّيَّتِي ۚ رَبَّنَا وَتَقَبَّلْ دُعَاءِ',src:'سورة إبراهيم: 40'},
+  {n:'دعاء إبراهيم عليه السلام',t:'رَبِّ هَبْ لِي مِنَ الصَّالِحِينَ',src:'سورة الصافات: 100'},
+  {n:'دعاء إصلاح الذرية',t:'رَبِّ أَوْزِعْنِي أَنْ أَشْكُرَ نِعْمَتَكَ الَّتِي أَنْعَمْتَ عَلَيَّ وَعَلَىٰ وَالِدَيَّ وَأَنْ أَعْمَلَ صَالِحًا تَرْضَاهُ وَأَصْلِحْ لِي فِي ذُرِّيَّتِي ۖ إِنِّي تُبْتُ إِلَيْكَ وَإِنِّي مِنَ الْمُسْلِمِينَ',src:'سورة الأحقاف: 15'},
+  {n:'تعويذ النبي ﷺ للحسن والحسين',t:'أُعِيذُكُمَا بِكَلِمَاتِ اللَّهِ التَّامَّةِ، مِنْ كُلِّ شَيْطَانٍ وَهَامَّةٍ، وَمِنْ كُلِّ عَيْنٍ لَامَّةٍ',src:'صحيح البخاري (3371). وللطفل الواحد: «أُعِيذُكَ»، وللبنت: «أُعِيذُكِ»'},
+  {n:'دعاء التيسير',t:'اللَّهُمَّ لَا سَهْلَ إِلَّا مَا جَعَلْتَهُ سَهْلًا، وَأَنْتَ تَجْعَلُ الْحَزْنَ إِذَا شِئْتَ سَهْلًا',src:'صحيح ابن حبان (974)، وصححه الألباني في السلسلة الصحيحة (2886). دعاء عام، ولم يثبت دعاء خاص بالولادة'}
+];
+const dayIndex=()=>{const d=new Date();return Math.floor((Date.UTC(d.getFullYear(),d.getMonth(),d.getDate())-Date.UTC(d.getFullYear(),0,0))/864e5);};
 function todayTasks(){
   const out=[], S=schedule();
   for(const [k,label] of SLOTS) for(const {p,n} of S[k]) out.push({id:`med_${k}_${p.id}`.replace(/[^A-Za-z0-9_]/g,''),grp:'الأدوية',t:`${p.name} × ${n}`,sub:label,med:true});
   const m=curMonth(); const tri=m?MONTHS[m-1].tri:1;
   DAILY_FOOD[tri].forEach(([t,sub],i)=>out.push({id:`food_${tri}_${i}`,grp:'الطعام',t,sub}));
   if(m===9) out.push({id:'food_dates',grp:'الطعام',t:'6 تمرات',sub:'في الأسابيع الأخيرة، بعد سؤال طبيبتك'});
+  const di=dayIndex()%DUAS.length, D=DUAS[di];
+  out.push({id:'dua_day',grp:'الدعاء والذكر',t:'دعاء اليوم: '+D.n,sub:'',dua:D});
+  out.push({id:'dhikr_am',grp:'الدعاء والذكر',t:'أذكار الصباح',sub:'بعد الفجر'});
+  out.push({id:'dhikr_pm',grp:'الدعاء والذكر',t:'أذكار المساء',sub:'بعد العصر'});
+  out.push({id:'quran_wird',grp:'الدعاء والذكر',t:'ورد القرآن',sub:'ولو صفحة واحدة'});
   const today=dayKey();
   TS.appts.filter(a=>!a.done&&a.date<=today).sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time))
     .forEach(a=>out.push({id:'appt_'+a.id,appt:a,grp:'المواعيد',t:a.title,sub:(a.date<today?'فات موعده: ':'')+APPT_KIND[a.type||'task']+(a.time?' · '+a.time:'')+(a.note?' · '+a.note:''),late:a.date<today}));
@@ -1176,7 +1208,7 @@ function renderToday(){
     if(t.grp!==g){ g=t.grp; h+=`<div class="tgroup">${g}</div>`; }
     const d=t.appt?null:done[t.id];
     h+=`<label class="task${d?' done':''}${t.late?' late':''}"><input type="checkbox" ${d?'checked':''} data-task="${t.id}" data-label="${esc(t.t)}"${t.med?' data-med="1"':''}${t.appt?` data-appt="${t.appt.id}"`:''}>
-      <span class="tt">${esc(t.t)}<small>${esc(t.sub||'')}</small></span><span class="by">${d?esc((d.by?d.by+' · ':'')+fmtTime(d.at)):''}</span></label>`;
+      <span class="tt"><span class="ttl">${esc(t.t)}</span>${t.dua?`<span class="ayah">${t.dua.t}</span><small>${esc(t.dua.src)}</small>`:`<small>${esc(t.sub||'')}</small>`}</span><span class="by">${d?esc((d.by?d.by+' · ':'')+fmtTime(d.at)):''}</span></label>`;
     if(t.grp==='الطعام' && !tasks.some((x,i)=>i>tasks.indexOf(t)&&x.grp==='الطعام')){
       h+=`<div class="water"><span class="tt">الماء: <span class="num">${water}</span> من 8 أكواب</span><div class="cups" role="group" aria-label="أكواب الماء">${Array.from({length:8},(_,i)=>`<button type="button" class="cup${i<water?' full':''}" data-cup="${i+1}" aria-label="${i+1} أكواب"></button>`).join('')}</div></div>`;
     }
@@ -1192,7 +1224,7 @@ function renderToday(){
       ${x.id?`<button class="del" type="button" data-delappt="${x.id}" aria-label="حذف">×</button>`:'<span></span>'}</div>`;}).join('')
     : '<p class="empty">لا شيء خلال الأسابيع الثلاثة القادمة. أضيفي مواعيد الطبيب والتحاليل لتظهر هنا.</p>';
   const s=streak(); $('tStreak').textContent = s? `الالتزام بالأدوية: ${s} ${s===1?'يوم':s<=10?'أيام':'يومًا'} متتالية` : '';
-  $('tLog').innerHTML = TS.log.length ? TS.log.slice(0,40).map(l=>`<li><span class="ic ${l.kind==='appt'?'appt':l.kind==='water'?'water':''}" aria-hidden="true">${l.kind==='appt'?'📅':l.kind==='water'?'💧':'✓'}</span><span><b>${esc(l.by||'')}</b> ${esc(l.text)}</span><time>${whenTxt(l.t)}</time></li>`).join('')
+  $('tLog').innerHTML = TS.log.length ? TS.log.slice(0,40).map(l=>`<li><span class="ic ${l.kind==='appt'?'appt':l.kind==='water'?'water':l.kind==='dua'?'dua':''}" aria-hidden="true">${l.kind==='appt'?'📅':l.kind==='water'?'💧':l.kind==='dua'?'🤲':'✓'}</span><span>${l.by?`<b>${esc(l.by)}</b> · `:''}${esc(l.text)}</span><time>${whenTxt(l.t)}</time></li>`).join('')
     : '<li><span></span><span class="empty">ستظهر هنا كل مهمة تُنجز وكل موعد يُضاف، مع اسم من قام بها.</span><span></span></li>';
   const left=total-nDone; $('todayBadge').hidden=!left; $('todayBadge').textContent=left;
 }
@@ -1201,20 +1233,21 @@ function medCount(){ return todayTasks().filter(t=>t.med).length; }
 async function toggleTask(id,label,on,isMed,apptId){
   const today=dayKey();
   if(apptId){ const a=TS.appts.find(x=>x.id===apptId); if(!a) return; a.done=on; a.doneBy=meName(); a.doneAt=Date.now();
-    if(tsCloud){ Cloud.saveAppt(a); if(on) Cloud.addLog('أنجز: '+a.title,'appt'); } else { if(on) logLocal('أنجز: '+a.title,'appt'); saveTS(); }
+    if(tsCloud){ Cloud.saveAppt(a); if(on) Cloud.addLog('تمّ: '+a.title,'appt'); } else { if(on) logLocal('تمّ: '+a.title,'appt'); saveTS(); }
     renderToday(); return; }
   const day=TS.days[today]||(TS.days[today]={date:today,done:{}}); day.done=day.done||{};
   if(on) day.done[id]={at:Date.now(),by:meName()}; else delete day.done[id];
   day.medTotal=medCount();
-  if(tsCloud){ Cloud.markTask(today,id,on,{medTotal:day.medTotal}); if(on) Cloud.addLog((isMed?'أخذت ':'أنجزت ')+label,isMed?'med':'food'); }
-  else { if(on) logLocal((isMed?'أخذت ':'أنجزت ')+label,isMed?'med':'food'); saveTS(); }
+  const txt='تمّ: '+label, kind=isMed?'med':(/^(dua|dhikr|quran)_/.test(id)?'dua':'food');
+  if(tsCloud){ Cloud.markTask(today,id,on,{medTotal:day.medTotal}); if(on) Cloud.addLog(txt,kind); }
+  else { if(on) logLocal(txt,kind); saveTS(); }
   renderToday();
 }
 function setWater(n){
   const today=dayKey(), day=TS.days[today]||(TS.days[today]={date:today,done:{}});
   const before=day.water||0; day.water=(n===before)?n-1:n;
-  if(tsCloud){ Cloud.setDay(today,{water:day.water}); if(before<8&&day.water>=8) Cloud.addLog('أكملت شرب 8 أكواب ماء','water'); }
-  else { if(before<8&&day.water>=8) logLocal('أكملت شرب 8 أكواب ماء','water'); saveTS(); }
+  if(tsCloud){ Cloud.setDay(today,{water:day.water}); if(before<8&&day.water>=8) Cloud.addLog('اكتمل شرب 8 أكواب ماء','water'); }
+  else { if(before<8&&day.water>=8) logLocal('اكتمل شرب 8 أكواب ماء','water'); saveTS(); }
   renderToday();
 }
 $('tList').addEventListener('change',e=>{const c=e.target.closest('input[data-task]'); if(c) toggleTask(c.dataset.task,c.dataset.label,c.checked,!!c.dataset.med,c.dataset.appt);});
@@ -1226,7 +1259,7 @@ $('apptForm').addEventListener('submit',e=>{
   const a={id:'a'+Date.now().toString(36)+Math.random().toString(36).slice(2,6),title:$('a_title').value.trim().slice(0,80),type:$('a_type').value,date:$('a_date').value,time:$('a_time').value||'',note:$('a_note').value.trim().slice(0,120),done:false,by:meName(),at:Date.now()};
   if(!a.title||!/^\d{4}-\d{2}-\d{2}$/.test(a.date)) return;
   TS.appts.push(a);
-  const txt=`أضاف ${APPT_KIND[a.type]}: ${a.title} (${new Date(keyToU(a.date)).toLocaleDateString('ar-SY-u-nu-latn',{timeZone:'UTC',day:'numeric',month:'long'})})`;
+  const txt=`موعد جديد: ${APPT_KIND[a.type]} «${a.title}» (${new Date(keyToU(a.date)).toLocaleDateString('ar-SY-u-nu-latn',{timeZone:'UTC',day:'numeric',month:'long'})})`;
   if(tsCloud){ Cloud.saveAppt(a); Cloud.addLog(txt,'appt'); } else { logLocal(txt,'appt'); saveTS(); }
   e.target.reset(); e.target.hidden=true; renderToday(); toast('حُفظ الموعد');
 });
@@ -1245,6 +1278,7 @@ Cloud.on((what,x)=>{
 });
 setInterval(()=>{ if(!document.hidden) renderToday(); }, 60000);
 
+$('duaList').innerHTML=DUAS.map(d=>`<div><b>${esc(d.n)}</b><span class="ayah">${d.t}</span><small>${esc(d.src)}</small></div>`).join('');
 const TABS=['today','pregnancy','months','meds','tips'];
 function route(){
   const jm=(location.hash||'').match(/join=([0-9A-Z]{8})/i);

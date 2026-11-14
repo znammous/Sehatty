@@ -26,7 +26,7 @@ const Cloud = (() => {
   // 'local' (بلا إنترنت أو من ملف) | 'loading' | 'out' | 'linking' | 'ok' | 'offline' | 'kid'
   let status = 'loading';
   let fb = null, user = null, fid = null, joining = false, parent = false;
-  let memberData = null, dataUnsub = null, guardName = '';
+  let memberData = null, dataUnsub = null, guardName = '', ownerName = '';
   let extraUnsubs = [];   // المهام اليومية والسجل والمواعيد
   const listeners = [];
   const notify = (what, x) => listeners.forEach(fn => fn(what, x));
@@ -63,7 +63,7 @@ const Cloud = (() => {
   function stopAll() {
     if (dataUnsub) { dataUnsub(); dataUnsub = null; }
     extraUnsubs.forEach(u => u()); extraUnsubs = [];
-    memberData = null; parent = false; guardName = '';
+    memberData = null; parent = false; guardName = ''; ownerName = '';
   }
 
   async function onUser(u) {
@@ -130,7 +130,16 @@ const Cloud = (() => {
         .sort((a, b) => (b.guardian - a.guardian) || (b.at - a.at)));
     };
     extraUnsubs.push(fs.onSnapshot(famCol('members'), snap => { mem = snap.docs.map(d => ({ id: d.id, ...d.data() })); pushDevices(); }, () => {}));
-    extraUnsubs.push(fs.onSnapshot(famCol('guardians'), snap => { gua = {}; snap.docs.forEach(d => { gua[d.id] = d.data(); }); pushDevices(); }, () => {}));
+    extraUnsubs.push(fs.onSnapshot(famCol('guardians'), snap => {
+      gua = {}; snap.docs.forEach(d => { gua[d.id] = d.data(); }); pushDevices();
+      const mine = user.isAnonymous && gua[user.uid] && gua[user.uid].name;
+      if (mine && mine !== guardName) { guardName = mine; notify('name'); }
+    }, () => {}));
+    // اسم صاحب الحساب في التطبيق (بدل اسم حساب Google أو بريده) في sehatty/owner
+    if (!user.isAnonymous) extraUnsubs.push(fs.onSnapshot(famDoc('sehatty', 'owner'), snap => {
+      const n = (snap.exists() && snap.data().name) || '';
+      if (n !== ownerName) { ownerName = n; notify('name'); }
+    }, () => {}));
     extraUnsubs.push(fs.onSnapshot(famCol('sehattyAppts'), snap => {
       notify('appts', { list: snap.docs.map(d => ({ id: d.id, ...d.data() })), fromCache: snap.metadata.fromCache });
     }, () => {}));
@@ -309,14 +318,26 @@ const Cloud = (() => {
       .then(() => true).catch(() => false);
   }
 
+  // ولي الأمر يغيّر اسمه الظاهر في التطبيق: صاحب الحساب في sehatty/owner، وولي الأمر المنضم برمز في guardians
+  function setName(name) {
+    const n = String(name || '').trim().slice(0, 40);
+    if (!live() || !n) return Promise.resolve(false);
+    const p = user.isAnonymous
+      ? fb.fs.updateDoc(famDoc('guardians', user.uid), { name: n })
+      : fb.fs.setDoc(famDoc('sehatty', 'owner'), { name: n }, { merge: true });
+    if (user.isAnonymous) guardName = n; else ownerName = n;
+    notify('name');
+    return p.then(() => true).catch(() => false);
+  }
+
   function who() {
     if (!user) return '';
-    if (!user.isAnonymous) return user.displayName || user.email || 'ولي الأمر';
+    if (!user.isAnonymous) return ownerName || user.displayName || user.email || 'ولي الأمر';
     return guardName || (memberData && memberData.name) || '';
   }
 
   return {
-    start, signIn, join, signOut, save, markTask, setDay, addLog, saveAppt, deleteAppt, publishKids, sendHeart, removeDevice, createCode, cancelCode,
+    start, signIn, join, signOut, save, setName, markTask, setDay, addLog, saveAppt, deleteAppt, publishKids, sendHeart, removeDevice, createCode, cancelCode,
     diaryWatch, diarySave, diaryDelete, diaryImg,
     get diaryOn() { return diaryOn(); },
     get uid() { return user ? user.uid : ''; },

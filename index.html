@@ -182,6 +182,8 @@ footer{color:var(--muted);font-size:12.5px;max-width:80ch;line-height:1.7}
 .toast.show{opacity:1}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 .pbtn{border:0;background:none;color:var(--accent);font-size:12.5px;padding:0;text-decoration:underline;text-underline-offset:3px;font-weight:500}
+.prod .pacts{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+.pbtn.pdel{color:var(--bad)}
 .prod .mid{min-width:0;display:flex;flex-direction:column;gap:2px}
 .ghead{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:8px}
 .badge{font-size:11.5px;border-radius:20px;padding:1px 9px;background:var(--warn-soft);color:var(--warn);font-weight:600;white-space:nowrap}
@@ -376,6 +378,8 @@ header.top{align-items:center}
 .confirm h2{font-size:19px}
 .cbtns{justify-content:center;width:100%}
 .cbtns .btn{flex:1;padding:10px 14px;font-size:15px}
+.confirm.danger .cicon{background:var(--bad-soft)}
+.btn.primary.danger{background:var(--bad);border-color:var(--bad)}
 .wstep{display:flex;flex-direction:column;gap:12px;text-align:center;align-items:stretch}
 .wstep h2{font-size:21px}
 #wMom{text-align:start}
@@ -1100,10 +1104,11 @@ const BASE = [
 const imgOf=p=>p.img||IMG[p.id]||null;
 const EXAMPLE = {gyno:1,ferrofol:1,damvita:1,folic5:1,ostovit:2,omega:1,metformin:2};
 const KEY='mizan-hamel-v1';
-let state={sel:{...EXAMPLE},custom:[]};
-try{const s=JSON.parse(localStorage.getItem(KEY)||'null'); if(s&&s.sel) state={sel:s.sel,custom:s.custom||[]};}catch(e){}
+let state={sel:{...EXAMPLE},custom:[],hidden:[]};
+try{const s=JSON.parse(localStorage.getItem(KEY)||'null'); if(s&&s.sel) state={sel:s.sel,custom:s.custom||[],hidden:Array.isArray(s.hidden)?s.hidden:[]};}catch(e){}
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){} pushCloud();};
-const all=()=>BASE.concat(state.custom);
+// الأصناف الأساسية المحذوفة تُخفى فقط (state.hidden)، وتعود بزر «إعادة المثال»
+const all=()=>BASE.filter(p=>!state.hidden.includes(p.id)).concat(state.custom);
 const byId=id=>all().find(p=>p.id===id);
 const fmt=n=>{const r=Math.round(n*100)/100;return r.toLocaleString('en-US',{maximumFractionDigits:2})};
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -1123,7 +1128,7 @@ function renderPicker(){
       h+=`<div class="prod${on?' on':''}">
         <input type="checkbox" id="chk_${p.id}" data-id="${p.id}" ${on?'checked':''} aria-label="${esc(p.name)}">
         <div class="mid"><label for="chk_${p.id}" style="cursor:pointer"><div class="name">${esc(p.name)}</div><div class="sub">${esc(p.sub||'')}</div><div class="chips">${chips}</div></label>
-        <div><button type="button" class="pbtn" data-view="${p.id}">${imgOf(p)?'معاينة العلبة':'لا توجد صورة'}</button></div></div>
+        <div class="pacts"><button type="button" class="pbtn" data-view="${p.id}">${imgOf(p)?'معاينة العلبة':'لا توجد صورة'}</button><button type="button" class="pbtn pdel" data-del="${p.id}" aria-label="حذف ${esc(p.name)}">حذف</button></div></div>
         <div class="step-wrap"><div class="step">
           <button type="button" data-inc="${p.id}" aria-label="زيادة" ${on?'':'disabled'}>+</button>
           <output class="num">${on?u:0}</output>
@@ -1270,6 +1275,7 @@ function summaryText(){
 const toast=m=>{const t=$('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1800);};
 $('picker').addEventListener('change',e=>{const id=e.target.dataset.id; if(!id) return; const p=byId(id); if(e.target.checked) state.sel[id]=p.def||1; else delete state.sel[id]; render();});
 $('picker').addEventListener('click',e=>{
+  const del=e.target.closest('[data-del]'); if(del){askDelete(del.dataset.del);return;}
   const inc=e.target.closest('[data-inc]'), dec=e.target.closest('[data-dec]');
   if(inc){const id=inc.dataset.inc; state.sel[id]=Math.min((state.sel[id]||0)+1,6); render();}
   if(dec){const id=dec.dataset.dec; const v=(state.sel[id]||0)-1; if(v<=0) delete state.sel[id]; else state.sel[id]=v; render();}
@@ -1506,7 +1512,7 @@ function readImg(file){
   });
 }
 $('clearBtn').onclick=()=>{state.sel={}; render();};
-$('exampleBtn').onclick=()=>{state.sel={...EXAMPLE}; render();};
+$('exampleBtn').onclick=()=>{state.sel={...EXAMPLE}; state.hidden=[]; render();};
 $('copyBtn').onclick=()=>{
   const txt=summaryText();
   navigator.clipboard.writeText(txt).then(()=>toast('نُسخ الملخص، الصقيه في واتساب')).catch(()=>{
@@ -1533,7 +1539,7 @@ $('addForm').addEventListener('submit',async e=>{
 var applying=false, pushT=null, cloudReady=false;
 function snapshotData(){
   const due = dueState.example ? null : {method:dueState.method,date:dueState.date,cycle:+dueState.cycle||28,usw:+dueState.usw||0,usd:+dueState.usd||0};
-  return {v:1, sel:state.sel, custom:state.custom, due};
+  return {v:1, sel:state.sel, custom:state.custom, hidden:state.hidden, due};
 }
 function pushCloud(){
   if(applying||!cloudReady||typeof Cloud==='undefined') return;
@@ -1548,7 +1554,7 @@ function pushCloud(){
 function applyRemote(d){
   applying=true;
   try{
-    state.sel=d.sel||{}; state.custom=Array.isArray(d.custom)?d.custom:[];
+    state.sel=d.sel||{}; state.custom=Array.isArray(d.custom)?d.custom:[]; state.hidden=Array.isArray(d.hidden)?d.hidden:[];
     try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){}
     if(d.due&&d.due.date){
       dueState={method:d.due.method||'lmp',date:d.due.date,cycle:d.due.cycle||28,usw:d.due.usw||0,usd:d.due.usd||0};
@@ -1816,10 +1822,33 @@ function askTask(c){
   $('cTitle').textContent=on?(med?'هل تمّ تناول الدواء؟':kind==='dua'?'هل تمّ؟':kind==='appt'?'هل تمّ الموعد؟':'هل تمّت؟'):'إلغاء التعليم؟';
   $('cText').textContent=on?lbl:`ستعود «${lbl}» إلى المهام غير المنجزة.`;
   $('cYes').textContent=on?'نعم، تمّ':'نعم، ألغِ';
-  $('confirmDlg').hidden=false; $('cYes').focus();
+  openConfirm(false,'ليس بعد');
 }
-function closeConfirm(){ $('confirmDlg').hidden=true; pendingTask=null; }
-$('cYes').onclick=()=>{ const t=pendingTask; closeConfirm(); if(t) toggleTask(t.id,t.lbl,t.on,t.med,t.appt); };
+// النافذة نفسها لتأكيد حذف صنف من الأدوية، بلون التحذير
+let pendingAction=null;
+function openConfirm(danger,noTxt){
+  $('confirmDlg').querySelector('.confirm').classList.toggle('danger',danger); $('cYes').classList.toggle('danger',danger);
+  $('cNo').textContent=noTxt; $('confirmDlg').hidden=false; (danger?$('cNo'):$('cYes')).focus();
+}
+function askDelete(id){
+  const p=byId(id); if(!p) return;
+  const custom=state.custom.some(c=>c.id===id);
+  pendingTask=null; pendingAction=()=>deleteMed(id);
+  $('cIcon').textContent='🗑️';
+  $('cTitle').textContent='حذف هذا الصنف؟';
+  $('cText').textContent=`سيُحذف «${p.name}» من قائمة أدويتك ومن جدول اليوم والنتيجة.`+(custom?' لا يمكن التراجع عن ذلك.':' يمكن إعادته لاحقًا بزر «إعادة المثال».');
+  $('cYes').textContent='نعم، احذف';
+  openConfirm(true,'تراجع');
+}
+function deleteMed(id){
+  const p=byId(id); if(!p) return;
+  delete state.sel[id];
+  if(state.custom.some(c=>c.id===id)) state.custom=state.custom.filter(c=>c.id!==id);
+  else if(!state.hidden.includes(id)) state.hidden.push(id);
+  render(); toast('حُذف '+p.name);
+}
+function closeConfirm(){ $('confirmDlg').hidden=true; pendingTask=null; pendingAction=null; }
+$('cYes').onclick=()=>{ const t=pendingTask, a=pendingAction; closeConfirm(); if(a) a(); else if(t) toggleTask(t.id,t.lbl,t.on,t.med,t.appt); };
 $('cNo').onclick=closeConfirm;
 $('confirmDlg').addEventListener('click',e=>{ if(e.target.id==='confirmDlg') closeConfirm(); });
 document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&!$('confirmDlg').hidden) closeConfirm(); });
@@ -1908,7 +1937,7 @@ function applyKidMode(){
 }
 function renderKids(){
   if(!document.body.classList.contains('kidmode')) return;
-  const L=kidLmp(), st=Cloud.status, name=(st==='kid'&&Cloud.who)?Cloud.who:'';
+  const L=kidLmp(), st=Cloud.status, name=((st==='kid'||Cloud.live)&&Cloud.who)?Cloud.who:'';
   $('kHi').textContent= name?`أهلًا يا ${name}!`:'أهلًا يا بطل!';
   $('kExit').hidden= st==='kid';
   $('kExit').textContent= kidFlag ? 'خروج من وضع الأطفال' : kidPeek ? 'رجوع إلى الصفحة الرئيسية' : 'ماما أو بابا؟ ادخلوا من هنا';
@@ -1969,7 +1998,7 @@ $('kHeart').onclick=async()=>{
   heartAt=Date.now();
   const st=Cloud.status;
   if(st==='kid'){ $('kSent').textContent='يُرسل…'; const ok=await Cloud.sendHeart(Cloud.who||''); $('kSent').textContent= ok?'وصل قلبك لماما 💗':'سيصل قلبك حين يعود الإنترنت 💗'; return; }
-  if(Cloud.live){ Cloud.sendHeart('الأطفال'); $('kSent').textContent='وصل قلبك لماما 💗'; return; }
+  if(Cloud.live){ Cloud.sendHeart(String(Cloud.who||'الأطفال').slice(0,40)); $('kSent').textContent='وصل قلبك لماما 💗'; return; }
   if(role()!=='kid'){ TS.log.unshift({t:Date.now(),by:'الأطفال',text:'أرسلوا قلبًا لماما 💗',kind:'heart'}); TS.log=TS.log.slice(0,100); saveTS(); }
   $('kSent').textContent='وصل قلبك لماما 💗';
 };
@@ -1978,7 +2007,7 @@ $('kDuaBtn').onclick=async()=>{
   const mark=()=>{ try{localStorage.setItem(KEY+'-kdua',dayKey())}catch(e){} renderKids(); };
   if(st==='kid'){ out.textContent='يُرسل…'; const ok=await Cloud.sendHeart(String(Cloud.who||'').slice(0,30)+'|d'+i);
     if(!ok){ out.textContent='تعذّر الإرسال، جرّب حين يعود الإنترنت 🤲'; return; } }
-  else if(Cloud.live) Cloud.sendHeart('الأطفال|d'+i);
+  else if(Cloud.live) Cloud.sendHeart(String(Cloud.who||'الأطفال').slice(0,30)+'|d'+i);
   else if(role()!=='kid'){ TS.log.unshift({t:Date.now(),by:'الأطفال',text:`دعوا لماما: ${d.t} 🤲`,kind:'dua'}); TS.log=TS.log.slice(0,100); saveTS(); }
   out.textContent='وصل دعاؤك لماما، وغدًا دعاء جديد 🤲'; mark();
 };
@@ -2013,7 +2042,10 @@ function renderSettings(){
   const live=Cloud.live&&['ok','offline'].includes(Cloud.status);
   $('setBtn').hidden=!adultAccess();
   $('sAccount').innerHTML = live
-    ? `<div class="who">✓ متصل بحساب العائلة${Cloud.who?' · '+esc(Cloud.who):''}</div><p class="hint">${Cloud.owner?'صاحب الحساب (دخول بحساب Google).':'ولي أمر انضم برمز.'} البيانات تُحفظ وتظهر على أجهزة أولياء الأمر.</p><button class="btn" id="sOut" type="button">خروج من هذا الجهاز</button>`
+    ? `<div class="who">✓ متصل بحساب العائلة${Cloud.who?' · '+esc(Cloud.who):''}</div><p class="hint">${Cloud.owner?'صاحب الحساب (دخول بحساب Google).':'ولي أمر انضم برمز.'} البيانات تُحفظ وتظهر على أجهزة أولياء الأمر.</p>
+      <form class="dform" id="sNameF"><label>اسمك في التطبيق<input id="sName" maxlength="40" autocomplete="off" placeholder="مثل بابا أو أبو محمد" value="${esc(Cloud.who||'')}"></label>
+      <button class="btn" type="submit">حفظ الاسم</button><p class="hint">يظهر في السجل والدفتر والدعاء بدل ${Cloud.owner?'اسم حساب Google أو بريده':'الاسم الذي انضممت به'}، حتى من واجهة الأطفال على هذا الجهاز.</p></form>
+      <button class="btn" id="sOut" type="button">خروج من هذا الجهاز</button>`
     : `<p>تعملين دون حساب: البيانات في هذا الجهاز فقط، ولا تظهر على جوال الأب.</p><button class="btn primary" id="sLink" type="button">ربط بحساب العائلة</button>`;
   $('sAddP').hidden=!live; $('sDevP').hidden=!live;
   if(live) $('sDevices').innerHTML=devicesHtml();
@@ -2070,7 +2102,13 @@ document.addEventListener('click',async e=>{
     const ok=await Cloud.removeDevice(cut.dataset.cut); toast(ok?'فُصل الجهاز عن العائلة':'تعذّر الفصل، أعيدوا المحاولة'); if(!ok) renderSettings();
   }
 });
-Cloud.on(what=>{ if(what==='devices'){ if(!$('sDevP').hidden) $('sDevices').innerHTML=devicesHtml(); renderPair(); } else if(what==='status') renderSettings(); });
+Cloud.on(what=>{ if(what==='devices'){ if(!$('sDevP').hidden) $('sDevices').innerHTML=devicesHtml(); renderPair(); } else if(what==='status') renderSettings();
+  else if(what==='name'){ renderAcct(); if(document.activeElement!==$('sName')) renderSettings(); renderKids(); } });
+document.addEventListener('submit',async e=>{
+  if(e.target.id!=='sNameF') return; e.preventDefault();
+  const n=$('sName').value.trim(); if(!n){ toast('اكتب الاسم أولًا'); $('sName').focus(); return; }
+  $('sName').blur(); const ok=await Cloud.setName(n); toast(ok?'حُفظ الاسم ✓':'تعذّر حفظ الاسم، أعيدوا المحاولة');
+});
 
 const TABS=['today','pregnancy','months','meds','diary','tips','settings'];
 function route(){

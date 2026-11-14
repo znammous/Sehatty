@@ -163,13 +163,16 @@ const Diary = (() => {
   }
   function openEdit(id) {
     const old = id ? entries.find(e => e.id === id) : null;
-    const role = old ? old.role : kidUi ? 'kid' : (ls.get(ROLE_KEY) || 'mom');
-    const who = typeof Cloud !== 'undefined' && Cloud.status === 'kid' ? (Cloud.who || '') : '';
+    const role = old ? old.role : kidOnly() ? 'kid' : (ls.get(ROLE_KEY) || 'mom');
+    const who = typeof Cloud !== 'undefined' && (Cloud.status === 'kid' || Cloud.live) ? (Cloud.who || '') : '';
     draft = old ? { ...old, img0: old.img, imgNew: undefined } : { m: sel, role, name: defName(role, who), mood: '', text: '', img0: false, imgNew: undefined };
     const el = sheet(); el.hidden = false; paintSheet(true);
     if (old && old.img) getImg(old.id).then(() => paintSheet());
   }
+  // واجهة الأطفال على جهاز ولي الأمر المتصل: يختار من يكتب، والذكرى تُحفظ باسم حسابه
+  const kidOnly = () => kidUi && !(typeof Cloud !== 'undefined' && Cloud.live);
   function defName(role, who) {
+    if (who && typeof Cloud !== 'undefined' && Cloud.live) return who;
     if (role === 'mom') return 'ماما';
     if (role === 'dad') return 'بابا';
     return who || ls.get(NAME_KEY);
@@ -179,7 +182,7 @@ const Diary = (() => {
     const text = g('dyText') ? g('dyText').value : d.text, name = g('dyName') ? g('dyName').value : d.name;
     d.text = text; d.name = name;
     const photo = d.imgNew !== undefined ? d.imgNew : (d.img0 ? imgs.get(d.id) || '' : '');
-    const lockRole = kidUi || (d.id && entries.some(e => e.id === d.id));
+    const lockRole = kidOnly() || (d.id && entries.some(e => e.id === d.id));
     el.innerHTML = `<figure class="welcome dy-form">
       <figcaption><span id="dyTitle">✍️ ${monthTitle(d.m)}</span><button class="btn" type="button" data-dy="close">إغلاق</button></figcaption>
       ${lockRole ? '' : `<div class="dy-field"><span>من يكتب؟</span><div class="dy-chips">${Object.keys(ROLES).map(k => `<button type="button" data-dy="role" data-v="${k}" aria-pressed="${d.role === k}">${ROLES[k][1]} ${ROLES[k][0]}</button>`).join('')}</div></div>`}

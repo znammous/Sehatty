@@ -1,6 +1,6 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>صحتي للحامل</title>
+<title>ضيفنا الجديد</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=Readex+Pro:wght@500;700&display=swap">
@@ -267,6 +267,19 @@ details.weeks summary{cursor:pointer;font-weight:600;color:var(--accent)}
 .ftips b{display:block;color:var(--accent);font-weight:600}
 .avoid{margin:0;padding-inline-start:20px;display:flex;flex-direction:column;gap:6px;font-size:14px}
 .avoid li::marker{color:var(--bad)}
+header.top{align-items:center}
+.acct{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 14px;font-weight:600;font-size:13.5px;color:var(--ink)}
+.acct:hover{border-color:var(--accent)}
+.acct .dot{width:9px;height:9px;border-radius:50%;background:var(--muted);flex:none}
+.acct[data-s="ok"] .dot{background:var(--ok)}
+.acct[data-s="offline"] .dot,.acct[data-s="loading"] .dot,.acct[data-s="linking"] .dot{background:var(--warn)}
+.acct[data-s="kid"] .dot{background:var(--info)}
+.abody{display:flex;flex-direction:column;gap:12px;font-size:14px}
+.abody .or{text-align:center;color:var(--muted);font-size:12.5px}
+.abody .big{padding:10px 14px;font-size:14.5px}
+.abody .who{background:var(--ok-soft);color:var(--ok);border-radius:10px;padding:10px 12px;font-weight:600}
+#jCode{letter-spacing:.2em;text-transform:uppercase;direction:ltr;text-align:center;font-variant-numeric:tabular-nums}
+@media (max-width:560px){.acct span{max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}}
 textarea.copybox{width:100%;min-height:160px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);font:inherit;font-size:13px;padding:8px}
 </style>
 
@@ -274,8 +287,9 @@ textarea.copybox{width:100%;min-height:160px;border:1px solid var(--line);border
   <header class="top">
     <div class="brand">
       <svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true"><rect x="1" y="1" width="38" height="38" rx="10" fill="var(--accent-soft)"/><path d="M20 9v20M11 14h18M11 14l-4 9h8zM29 14l-4 9h8zM14 31h12" stroke="var(--accent)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      <div><h1>صحتي للحامل</h1><p class="lede">موعد ولادتك، وأدويتك ومكملاتها، في مكان واحد.</p></div>
+      <div><h1>ضيفنا الجديد</h1><p class="lede">متابعة الحمل للعائلة: موعد الولادة، والأدوية، والطعام شهرًا بشهر.</p></div>
     </div>
+    <button class="acct" id="acctBtn" type="button"><i class="dot" id="acctDot"></i><span id="acctTxt">حساب العائلة</span></button>
   </header>
 
   <nav class="tabs" aria-label="أقسام التطبيق">
@@ -440,13 +454,21 @@ textarea.copybox{width:100%;min-height:160px;border:1px solid var(--line);border
         <button class="btn primary" type="submit">احسبي موعدي</button>
         <button class="btn" type="button" id="wSkip">لاحقًا</button>
       </div>
+      <button class="pbtn" type="button" id="wAcct" style="align-self:flex-start">عندكم حساب في تطبيقات العائلة؟ ادخلي من هنا</button>
     </form>
+  </figure>
+</div>
+<div class="viewer" id="acct" hidden role="dialog" aria-modal="true" aria-labelledby="aTitle">
+  <figure class="welcome">
+    <figcaption><span id="aTitle">حساب العائلة</span><button class="btn" id="aClose" type="button">إغلاق</button></figcaption>
+    <div id="aBody" class="abody"></div>
   </figure>
 </div>
 <div class="viewer" id="viewer" hidden role="dialog" aria-modal="true" aria-label="معاينة العلبة">
   <figure><figcaption><span id="vCap"></span><button class="btn" id="vClose" type="button">إغلاق</button></figcaption><div id="vBody"></div></figure>
 </div>
 
+<script src="js/cloud.js"></script>
 <script>
 const N = {
   iron:{l:'الحديد',u:'ملغ',rda:27,warn:45,max:120,note:'فوق 45 ملغ جرعة علاجية بإشراف الطبيب'},
@@ -501,7 +523,7 @@ const EXAMPLE = {gyno:1,ferrofol:1,damvita:1,folic5:1,ostovit:2,omega:1,metformi
 const KEY='mizan-hamel-v1';
 let state={sel:{...EXAMPLE},custom:[]};
 try{const s=JSON.parse(localStorage.getItem(KEY)||'null'); if(s&&s.sel) state={sel:s.sel,custom:s.custom||[]};}catch(e){}
-const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){}};
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){} pushCloud();};
 const all=()=>BASE.concat(state.custom);
 const byId=id=>all().find(p=>p.id===id);
 const fmt=n=>{const r=Math.round(n*100)/100;return r.toLocaleString('en-US',{maximumFractionDigits:2})};
@@ -821,6 +843,7 @@ function renderDue(){
   $('wkBody').innerHTML=wk;
   window._due={edd,gaTxt};
   if(typeof renderMonths==='function') renderMonths();
+  pushCloud();
 }
 $('dueForm').addEventListener('input',()=>{
   dueState={method:$('d_method').value,date:$('d_date').value,cycle:$('d_cycle').value,usw:$('d_usw').value,usd:$('d_usd').value};
@@ -860,7 +883,7 @@ function openView(id){
 const closeView=()=>{$('viewer').hidden=true;};
 $('vClose').onclick=closeView;
 $('viewer').addEventListener('click',e=>{if(e.target.id==='viewer') closeView();});
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeView(); if(!$('welcome').hidden) closeWelcome();}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeView(); if(!$('acct').hidden){$('acct').hidden=true;return;} if(!$('welcome').hidden) closeWelcome();}});
 document.addEventListener('click',e=>{
   const v=e.target.closest('[data-view]'); if(v){openView(v.dataset.view);return;}
   const k=e.target.closest('[data-keep]');
@@ -898,9 +921,104 @@ $('addForm').addEventListener('submit',async e=>{
   state.custom.push({id,name,sub:'صنف مضاف',form:'حبة',cat:$('f_cat').value,def:units,c,img,why:'صنف أضفتِه من علبته.'});
   state.sel[id]=units; e.target.reset(); $('addBox').open=false; render(); toast('أُضيف الصنف');
 });
+/* ===== حساب العائلة والمزامنة ===== */
+// تُحفظ البيانات في الجهاز دائمًا، وعند الدخول بحساب العائلة تُحفظ أيضًا في families/{fid}/sehatty/main
+// فتظهر على أجهزة أولياء الأمر. أول نسخة من الحساب تغلب ما في الجهاز.
+var applying=false, pushT=null, cloudReady=false;
+function snapshotData(){
+  const due = dueState.example ? null : {method:dueState.method,date:dueState.date,cycle:+dueState.cycle||28,usw:+dueState.usw||0,usd:+dueState.usd||0};
+  return {v:1, sel:state.sel, custom:state.custom, due};
+}
+function pushCloud(){
+  if(applying||!cloudReady||typeof Cloud==='undefined') return;
+  if(!['ok','offline'].includes(Cloud.status)) return;
+  clearTimeout(pushT);
+  pushT=setTimeout(()=>{
+    let d=snapshotData();
+    if(JSON.stringify(d).length>900000){ d={...d,custom:d.custom.map(c=>({...c,img:null}))}; toast('صور الأصناف المضافة كبيرة، فحُفظت البيانات دونها'); }
+    Cloud.save(d);
+  },700);
+}
+function applyRemote(d){
+  applying=true;
+  try{
+    state.sel=d.sel||{}; state.custom=Array.isArray(d.custom)?d.custom:[];
+    try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){}
+    if(d.due&&d.due.date){
+      dueState={method:d.due.method||'lmp',date:d.due.date,cycle:d.due.cycle||28,usw:d.due.usw||0,usd:d.due.usd||0};
+      try{localStorage.setItem(KEY+'-due',JSON.stringify(dueState));localStorage.setItem(KEY+'-welcomed','1')}catch(e){}
+      $('welcome').hidden=true;
+    }
+    renderDue(); render();
+  } finally { applying=false; }
+}
+const ACCT_TXT={local:'محفوظ في هذا الجهاز',loading:'جارٍ الاتصال…',linking:'جارٍ الربط…',out:'حساب العائلة',ok:'محفوظ في حساب العائلة',offline:'بلا اتصال، يُحفظ لاحقًا',kid:'جهاز طفل'};
+const JOIN_ERR={'bad-code':'الرمز 8 أحرف أو أرقام، تأكدي منه.',expired:'الرمز غير صحيح أو انتهت صلاحيته (عشر دقائق). اطلبي رمزًا جديدًا.',network:'تعذّر الاتصال، تأكدي من الإنترنت ثم أعيدي المحاولة.','signed-in':'هذا الجهاز داخل بحساب Google بالفعل.',unavailable:'الاتصال بحساب العائلة غير متاح الآن.'};
+function renderAcct(){
+  const st=Cloud.status; $('acctBtn').dataset.s=st;
+  $('acctTxt').textContent = (st==='ok'&&Cloud.who) ? Cloud.who : (ACCT_TXT[st]||'حساب العائلة');
+  if($('acct').hidden) return;
+  const b=$('aBody');
+  if(st==='out'){
+    const keep={code:($('jCode')||{}).value||b.dataset.code||'',name:($('jName')||{}).value||''};
+    b.innerHTML=`<p>احفظي بيانات الحمل في حساب العائلة نفسه المستخدم في مجلس العائلة، فتظهر على جوال الأب والأم معًا. أجهزة الأطفال لا ترى البيانات الطبية.</p>
+      <button class="btn primary big" id="gBtn" type="button">دخول ولي الأمر بحساب Google</button>
+      <div class="or">أو</div>
+      <form class="dform" id="joinForm">
+        <label>رمز الانضمام من مجلس العائلة<input id="jCode" maxlength="9" autocomplete="off" placeholder="7KQ2M9XP" value="${esc(keep.code)}"></label>
+        <label>اسمك<input id="jName" maxlength="40" placeholder="مثل أم محمد" value="${esc(keep.name)}"></label>
+        <p class="werr" id="jErr" hidden></p>
+        <button class="btn primary" type="submit">انضمام</button>
+        <p class="hint">من مجلس العائلة على جوال ولي الأمر: «العائلة» ← «أضف فرداً» ← «ولي أمر آخر»، ثم اكتبي الرمز هنا.</p>
+      </form>`;
+  } else if(st==='ok'||st==='offline'){
+    b.innerHTML=`<div class="who">✓ متصل بحساب العائلة${Cloud.who?' · '+esc(Cloud.who):''}</div>
+      <p>بيانات الحمل والأدوية تُحفظ تلقائيًا وتظهر على أجهزة أولياء الأمر في العائلة.${st==='offline'?' لا يوجد اتصال الآن، وستُحفظ التغييرات حين يعود.':''}</p>
+      <button class="btn" id="outBtn" type="button">خروج من هذا الجهاز</button>`;
+  } else if(st==='kid'){
+    b.innerHTML=`<p>هذا الجهاز مرتبط بالعائلة كجهاز طفل، فلا تظهر عليه البيانات الطبية. واجهة الأطفال قادمة قريبًا.</p>
+      <p class="hint">للأم أو الأب: اطلبوا من مجلس العائلة رمز «ولي أمر آخر».</p>
+      <button class="btn" id="outBtn" type="button">خروج من هذا الجهاز</button>`;
+  } else if(st==='local'){
+    b.innerHTML=`<p>بياناتك محفوظة في هذا الجهاز فقط. لحفظها في حساب العائلة افتحي التطبيق من رابطه على الإنترنت وتأكدي من الاتصال.</p>`;
+  } else b.innerHTML=`<p>جارٍ الاتصال بحساب العائلة…</p>`;
+}
+function openAcct(code){ $('acct').hidden=false; if(code) $('aBody').dataset.code=code; renderAcct(); if(code&&$('jCode')) $('jCode').value=code; }
+$('acctBtn').onclick=()=>openAcct();
+$('aClose').onclick=()=>{$('acct').hidden=true;};
+$('acct').addEventListener('click',e=>{if(e.target.id==='acct') $('acct').hidden=true;});
+$('wAcct').onclick=()=>{closeWelcome(); openAcct();};
+$('aBody').addEventListener('click',async e=>{
+  if(e.target.id==='gBtn'){
+    try{ await Cloud.signIn(); }catch(err){ if(!/popup-closed|cancelled-popup/.test(err.code||'')) toast('تعذّر الدخول بحساب Google'); }
+  }
+  if(e.target.id==='outBtn'){ e.target.disabled=true; await Cloud.signOut().catch(()=>{}); cloudReady=false; toast('خرج هذا الجهاز من حساب العائلة'); renderAcct(); }
+});
+$('aBody').addEventListener('submit',async e=>{
+  if(e.target.id!=='joinForm') return; e.preventDefault();
+  const btn=e.target.querySelector('button[type=submit]'); btn.disabled=true; $('jErr').hidden=true;
+  try{ await Cloud.join($('jCode').value,$('jName').value); delete $('aBody').dataset.code; toast('تم الانضمام إلى حساب العائلة'); }
+  catch(err){ const m=JOIN_ERR[err.message]||'تعذّر الانضمام. أعيدي المحاولة.'; if($('jErr')){$('jErr').textContent=m;$('jErr').hidden=false;} }
+  finally{ if(btn.isConnected) btn.disabled=false; }
+});
+Cloud.on((what,x)=>{
+  if(what==='status'){ if(!['ok','offline'].includes(Cloud.status)) cloudReady=false; renderAcct(); return; }
+  if(what==='data'){
+    if(!x.exists){
+      if(x.fromCache) return;
+      cloudReady=true; Cloud.save(snapshotData());   // أول مرة لهذه العائلة: نرفع ما في الجهاز
+      return;
+    }
+    cloudReady=true; applyRemote(x.data);
+  }
+});
+Cloud.start();
+
 const TABS=['pregnancy','months','meds','tips'];
 function route(){
-  let t=(location.hash||'').slice(1); const toRes=t==='result'; if(toRes) t='meds'; if(!TABS.includes(t)) t='pregnancy';
+  const jm=(location.hash||'').match(/join=([0-9A-Z]{8})/i);
+  if(jm){ history.replaceState(null,'',location.pathname+location.search); openAcct(jm[1].toUpperCase()); }
+  let t=jm?'pregnancy':(location.hash||'').slice(1); const toRes=t==='result'; if(toRes) t='meds'; if(!TABS.includes(t)) t='pregnancy';
   TABS.forEach(k=>{$('v-'+k).hidden=k!==t;});
   document.querySelectorAll('.tab').forEach(a=>{if(a.dataset.tab===t) a.setAttribute('aria-current','page'); else a.removeAttribute('aria-current');});
   window.scrollTo(0,0);

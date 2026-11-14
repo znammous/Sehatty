@@ -1127,7 +1127,7 @@ function renderPicker(){
       const chips=CHIP_KEYS.filter(k=>p.c[k]).slice(0,4).map(k=>`<span class="chip">${N[k].l} <span class="num">${fmt(p.c[k])}</span></span>`).join('');
       h+=`<div class="prod${on?' on':''}">
         <input type="checkbox" id="chk_${p.id}" data-id="${p.id}" ${on?'checked':''} aria-label="${esc(p.name)}">
-        <div class="mid"><label for="chk_${p.id}" style="cursor:pointer"><div class="name">${esc(p.name)}</div><div class="sub">${esc(p.sub||'')}</div><div class="chips">${chips}</div></label>
+        <div class="mid"><label for="chk_${p.id}" style="cursor:pointer"><div class="name">${esc(p.name)}${typeof MedLookup!=='undefined'?MedLookup.badge(p):''}</div><div class="sub">${esc(p.sub||'')}</div><div class="chips">${chips}</div></label>
         <div class="pacts"><button type="button" class="pbtn" data-view="${p.id}">${imgOf(p)?'معاينة العلبة':'لا توجد صورة'}</button><button type="button" class="pbtn pdel" data-del="${p.id}" aria-label="حذف ${esc(p.name)}">حذف</button></div></div>
         <div class="step-wrap"><div class="step">
           <button type="button" data-inc="${p.id}" aria-label="زيادة" ${on?'':'disabled'}>+</button>
@@ -1171,6 +1171,7 @@ function buildAlerts(tot,src){
     A.push({lv:'info',t:'الميتفورمين يؤخذ مع الطعام',b:'يخفف ذلك اضطراب المعدة. ومع طول الاستعمال قد يقلل فيتامين B12، فاسألي عن فحصه.'});
     if(!tot.b12) A.push({lv:'warn',t:'لا يوجد B12 في القائمة',b:'مع الميتفورمين يُستحسن وجود مصدر لفيتامين B12 أو فحص مستواه.'});
   }
+  if(typeof MedLookup!=='undefined') A.unshift(...MedLookup.alerts(sel));
   if(tot.vitA&&tot.vitA>1500&&status('vitA',tot.vitA)!=='bad') A.push({lv:'warn',t:'فيتامين A مرتفع',b:'تأكدي أنه من نوع بيتا كاروتين وليس ريتينول، فالريتينول الزائد يضر الجنين.'});
   return A;
 }
@@ -1235,7 +1236,7 @@ function render(){
     const extra = g==='ironRx'||g==='folic' ? all().filter(p=>p.cat==='multi'&&state.sel[p.id]>0&&p.c[g==='ironRx'?'iron':'folic']) : [];
     ch+=`<div class="cmp"><div class="panel-head"><h3>${PURPOSE[g].t}</h3><span class="badge">${items.length} أصناف للغرض نفسه</span></div>
       <p class="tip">${PURPOSE[g].tip}${extra.length?` وانتبهي: ${esc(extra.map(p=>p.name).join('، '))} فيه هذه المادة أيضًا.`:''}</p>
-      <div class="opts">${items.map(p=>`<div class="opt"><div class="name">${esc(p.name)}</div>
+      <div class="opts">${items.map(p=>`<div class="opt"><div class="name">${esc(p.name)}${typeof MedLookup!=='undefined'?MedLookup.badge(p):''}</div>
         <div class="chips">${CHIP_KEYS.filter(k=>p.c[k]).slice(0,4).map(k=>`<span class="chip">${N[k].l} <span class="num">${fmt(p.c[k])}</span> ${N[k].u}</span>`).join('')}</div>
         <p class="why">${esc(p.why||'')}</p>
         <div class="acts"><button type="button" class="btn" data-keep="${p.id}">اعتماد هذا وحده</button>${imgOf(p)?`<button type="button" class="pbtn" data-view="${p.id}">معاينة العلبة</button>`:''}</div></div>`).join('')}</div></div>`;
@@ -1530,7 +1531,7 @@ $('addForm').addEventListener('submit',async e=>{
   const name=$('f_name').value.trim(); if(!name) return;
   if(!Object.keys(c).length&&!['rx','metformin'].includes($('f_cat').value)){toast('أدخلي مادة واحدة على الأقل');return;}
   const id='c'+Date.now(), units=Math.max(1,Math.min(6,parseInt($('f_units').value)||1));
-  state.custom.push({id,name,sub:ML?ML.sub:'صنف مضاف',form:ML?ML.form:'حبة',cat:$('f_cat').value,def:units,c,img,why:ML?ML.why:'صنف أضفتِه من علبته.'});
+  state.custom.push({id,name,sub:ML?ML.sub:'صنف مضاف',form:ML?ML.form:'حبة',cat:$('f_cat').value,def:units,c,img,why:ML?ML.why:'صنف أضفتِه من علبته.',risk:ML&&ML.risk||null});
   state.sel[id]=units; e.target.reset(); $('addBox').open=false; render(); toast('أُضيف الصنف');
 });
 /* ===== حساب العائلة والمزامنة ===== */

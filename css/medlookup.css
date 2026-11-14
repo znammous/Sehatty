@@ -13,3 +13,10 @@
 .msrc{font-size:11.5px}
 .mnote{margin:0;display:flex;flex-direction:column;gap:3px;font-size:12.5px;color:var(--ink);line-height:1.6}
 .mnote:empty{display:none}
+/* علامة الخطر على الحمل */
+.rbadge{display:inline-flex;align-items:center;gap:3px;margin-inline-start:6px;padding:1px 8px;border-radius:999px;font-size:11.5px;font-weight:700;vertical-align:middle;white-space:nowrap}
+.rbadge.bad{background:var(--bad-soft);color:var(--bad);border:1px solid var(--bad)}
+.rbadge.warn{background:var(--warn-soft);color:var(--ink);border:1px solid var(--warn)}
+.rnote{display:block;border-radius:8px;padding:8px 10px;font-size:13px;line-height:1.6;margin-bottom:4px}
+.rnote.bad{background:var(--bad-soft);color:var(--bad);border:1px solid var(--bad)}
+.rnote.warn{background:var(--warn-soft);color:var(--ink);border:1px solid var(--warn)}

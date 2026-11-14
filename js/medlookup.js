@@ -154,6 +154,7 @@ const MedLookup = (() => {
     const name = label || p.parts.map(x => x.label + (x.val != null ? ' ' + x.val + ' ' + (x.u || '') : '')).join(' + ').trim();
     const chips = Object.entries(p.c).map(([k, v]) => `${LBL[k]} ${v} ${UNIT[k]}`);
     return {
+      generic: label ? label.split(/\d/)[0].split('/')[0].trim() : ((p.parts.find(x => x.en) || {}).en || ''),
       name, src, form: form || 'حبة', c: p.c, rx: p.rx, missing: p.missing, noUnit: !!p.noUnit, notes: p.notes, chips,
       cat: catOf(p.c, p.rx),
       sub: p.rx ? (label ? '' : p.parts.map(x => x.en).join(' + ') + ' · ') + 'دواء بوصفة، لا يدخل في حساب الفيتامينات' : (p.notes.length ? 'يعادل: ' + chips.join(' + ') : 'أُضيف بالاسم العلمي والعيار'),
@@ -161,10 +162,69 @@ const MedLookup = (() => {
     };
   }
 
+  const getJSON = (url, signal) => fetch(url, { signal }).then(r => (r.ok ? r.json() : Promise.reject(new Error(r.status))));
+  // ───── أدوية خطرة على الحمل ─────
+  // bad: معروف أنه يسبب تشوهات أو إجهاضًا، أو ممنوع في الحمل. warn: يُحذر منه في مرحلة معينة أو بشروط.
+  // قائمة منتقاة من المراجع المعروفة (نشرات FDA وتصنيفات الأدوية المسببة للتشوهات)، ولا تغني عن الطبيب والصيدلي.
+  const RISK_RAW = [
+    ['bad', 'يسبب تشوهات شديدة في الجنين، وهو ممنوع تمامًا في الحمل.', 'isotretinoin', 'roaccutane', 'accutane', 'ايزوتريتينوين', 'روكتان', 'رواكيوتان', 'روأكيوتان', 'acitretin', 'neotigason', 'اسيتريتين', 'نيوتيجازون'],
+    ['bad', 'يسبب تشوهات في الجنين ونزيفًا، ويُستبدل عادة بحقن الهيبارين في الحمل.', 'warfarin', 'coumadin', 'marevan', 'وارفارين', 'كومادين', 'ماريفان'],
+    ['bad', 'يرفع خطر تشوهات العمود الفقري والقلب ويؤثر في نمو دماغ الجنين.', 'valproate', 'valproic acid', 'sodium valproate', 'divalproex', 'depakine', 'depakote', 'فالبروات', 'ديباكين', 'حمض الفالبرويك'],
+    ['bad', 'يرفع خطر تشوهات الجنين، ويحتاج متابعة الطبيب وجرعة عالية من الفوليك.', 'carbamazepine', 'tegretol', 'كاربامازيبين', 'تجريتول', 'phenytoin', 'epanutin', 'dilantin', 'فينيتوين', 'ابانوتين', 'topiramate', 'topamax', 'توبيرامات', 'توباماكس'],
+    ['bad', 'يسبب الإجهاض وتشوهات الجنين، وهو ممنوع في الحمل.', 'methotrexate', 'ميثوتريكسات', 'misoprostol', 'cytotec', 'ميزوبروستول', 'سايتوتك', 'سيتوتك', 'mifepristone', 'ميفيبريستون', 'thalidomide', 'ثاليدومايد', 'lenalidomide', 'leflunomide', 'arava', 'ليفلونومايد', 'mycophenolate', 'cellcept', 'مايكوفينولات', 'ribavirin', 'ريبافيرين'],
+    ['bad', 'يضر كلى الجنين ونموه، خاصة بعد الشهر الثالث. يُستبدل بدواء ضغط آمن في الحمل.', 'lisinopril', 'enalapril', 'captopril', 'ramipril', 'perindopril', 'fosinopril', 'quinapril', 'benazepril', 'ليسينوبريل', 'اينالابريل', 'كابتوبريل', 'راميبريل', 'بيريندوبريل', 'losartan', 'valsartan', 'irbesartan', 'candesartan', 'telmisartan', 'olmesartan', 'azilsartan', 'لوسارتان', 'فالسارتان', 'ايربيسارتان', 'كانديسارتان', 'تلميسارتان', 'اولميسارتان', 'cozaar', 'diovan', 'كوزار', 'ديوفان', 'entresto', 'انتريستو', 'aliskiren'],
+    ['bad', 'هرمون يؤثر في تكوّن الجنين، وهو ممنوع في الحمل.', 'finasteride', 'dutasteride', 'فيناسترايد', 'دوتاسترايد', 'danazol', 'دانازول', 'testosterone', 'تستوستيرون', 'letrozole', 'femara', 'ليتروزول', 'فيمارا', 'tamoxifen', 'تاموكسيفين', 'raloxifene', 'رالوكسيفين', 'diethylstilbestrol'],
+    ['bad', 'يسبب تشوهات في الجنين، وهو ممنوع في الحمل.', 'bosentan', 'ambrisentan', 'macitentan', 'riociguat', 'بوسنتان'],
+    ['bad', 'يسبب انقباض الرحم وقد يؤدي إلى الإجهاض.', 'ergotamine', 'cafergot', 'ارجوتامين', 'كافرجوت'],
+    ['warn', 'قد يرتبط بتشوه في قلب الجنين، ويحتاج متابعة دقيقة من الطبيب.', 'lithium', 'ليثيوم'],
+    ['warn', 'يصبغ أسنان الجنين ويؤثر في عظامه بعد الأسبوع 15، فيُستبدل عادة بمضاد آخر.', 'doxycycline', 'tetracycline', 'minocycline', 'دوكسيسيكلين', 'تتراسيكلين', 'مينوسيكلين', 'vibramycin', 'فيبراميسين'],
+    ['warn', 'مسكنات الالتهاب تُتجنب بعد الأسبوع 20 لأنها تضر كلى الجنين وقلبه. الباراسيتامول هو البديل المعتاد.', 'ibuprofen', 'brufen', 'advil', 'ايبوبروفين', 'بروفين', 'diclofenac', 'voltaren', 'cataflam', 'ديكلوفيناك', 'فولتارين', 'كاتافلام', 'naproxen', 'نابروكسين', 'mefenamic acid', 'ponstan', 'بونستان', 'ketorolac', 'كيتورولاك', 'celecoxib', 'celebrex', 'سيليكوكسيب', 'meloxicam', 'ميلوكسيكام', 'indomethacin', 'اندوميثاسين'],
+    ['warn', 'يُتجنب عادة في الشهور الثلاثة الأولى، ويختار الطبيب بديلًا أنسب لتلك المرحلة.', 'methimazole', 'carbimazole', 'ميثيمازول', 'كاربيمازول', 'neo-mercazole', 'نيوميركازول', 'trimethoprim', 'co-trimoxazole', 'sulfamethoxazole', 'septrin', 'bactrim', 'سبترين', 'باكتريم'],
+    ['warn', 'الجرعات العالية والطويلة منه قد تضر الجنين.', 'fluconazole', 'diflucan', 'فلوكونازول', 'ديفلوكان'],
+    ['warn', 'يوقفه الطبيب عادة أثناء الحمل.', 'atorvastatin', 'rosuvastatin', 'simvastatin', 'pravastatin', 'اتورفاستاتين', 'روزوفاستاتين', 'سيمفاستاتين', 'lipitor', 'crestor', 'ليبيتور', 'كريستور', 'amiodarone', 'اميودارون', 'spironolactone', 'aldactone', 'سبيرونولاكتون', 'الداكتون'],
+  ];
+  const RISK_ALIAS = [];
+  RISK_RAW.forEach(([lv, why, ...names]) => names.forEach(n => RISK_ALIAS.push({ a: norm(n), lv, why })));
+  RISK_ALIAS.sort((x, y) => y.a.length - x.a.length);
+  const RE_RISK = new RegExp(`(^|[^${L}])(?:وال|و|ال)?(${RISK_ALIAS.map(x => reEsc(x.a)).join('|')})(?![${L}])`);
+  const RISK_BY = new Map(RISK_ALIAS.map(x => [x.a, x]));
+  const RISK_SRC = 'قائمة الأدوية المعروف ضررها على الحمل';
+  function riskOfText(text) {
+    const m = RE_RISK.exec(norm(text));
+    return m ? { lv: RISK_BY.get(m[2]).lv, why: RISK_BY.get(m[2]).why, src: RISK_SRC } : null;
+  }
+  // خطر الصنف: من القائمة المحلية باسمه، أو مما حُفظ معه من نشرة openFDA عند إضافته
+  const risk = p => (p ? riskOfText([p.name, p.sub].join(' ')) || p.risk || null : null);
+  const RISK_ICON = { bad: '⛔', warn: '⚠️' }, RISK_T = { bad: 'خطر على الحمل', warn: 'يحتاج حذرًا في الحمل' };
+  const badge = p => { const r = risk(p); return r ? ` <span class="rbadge ${r.lv}" title="${h(r.why)}"><span aria-hidden="true">${RISK_ICON[r.lv]}</span> ${RISK_T[r.lv]}</span>` : ''; };
+  // تنبيهات النتيجة لكل صنف مختار فيه خطر، ومنها تنتقل إلى ملخص الطبيب
+  const alerts = items => items.map(p => [p, risk(p)]).filter(([, r]) => r).sort((a, b) => (a[1].lv === 'bad' ? 0 : 1) - (b[1].lv === 'bad' ? 0 : 1)).map(([p, r]) => ({
+    lv: r.lv, t: `${RISK_ICON[r.lv]} ${p.name}: ${RISK_T[r.lv]}`,
+    b: `${r.why} لا توقفيه فجأة ولا تكمليه من نفسك، وتواصلي مع طبيبك في أقرب وقت ليقرر البديل.${r.src && r.src !== RISK_SRC ? ' (المصدر: ' + r.src + ')' : ''}`,
+  }));
+  // للأدوية غير الموجودة في القائمة: نشرة الدواء في openFDA. تحذير الصندوق الأسود عن الجنين = خطر، وذكر الحمل في موانع الاستعمال = حذر
+  const fdaCache = new Map();
+  async function fdaRisk(generic) {
+    const g0 = String(generic || '').toLowerCase().replace(/[^a-z \-]/g, ' ').replace(/\s+/g, ' ').trim();
+    if (g0.length < 4) return null;
+    if (fdaCache.has(g0)) return fdaCache.get(g0);
+    const ctl = new AbortController(), t = setTimeout(() => ctl.abort(), 7000);
+    try {
+      const d = await getJSON('https://api.fda.gov/drug/label.json?limit=3&search=openfda.generic_name:%22' + encodeURIComponent(g0) + '%22', ctl.signal);
+      let r = null;
+      for (const x of d.results || []) {
+        const bw = (x.boxed_warning || []).join(' '), ci = (x.contraindications || []).join(' ');
+        if (/fetal|embryo|birth defect|pregnan|abortion/i.test(bw)) { r = { lv: 'bad', why: 'نشرة الدواء تحمل تحذيرًا مشددًا عن الضرر على الجنين أو الحمل.', src: 'نشرة الدواء في openFDA' }; break; }
+        if (/pregnan/i.test(ci)) r = { lv: 'warn', why: 'نشرة الدواء تذكر الحمل ضمن موانع الاستعمال أو قيوده.', src: 'نشرة الدواء في openFDA' };
+      }
+      fdaCache.set(g0, r);
+      return r;
+    } catch (e) { return null; } finally { clearTimeout(t); }
+  }
+
   // ───── RxNorm ─────
   const API = 'https://rxnav.nlm.nih.gov/REST/';
   const cache = new Map();
-  const getJSON = (url, signal) => fetch(url, { signal }).then(r => (r.ok ? r.json() : Promise.reject(new Error(r.status))));
   const tidy = n => n.replace(/\s*\[[^\]]*\]/g, '').replace(/\b(\d+(?:\.\d+)?) (MG|MCG|UNT|ML)\b/g, (_, a, b) => a + ' ' + ({ MG: 'mg', MCG: 'mcg', UNT: 'IU', ML: 'ml' }[b])).trim();
   async function remote(term, signal) {
     const key = norm(term);
@@ -203,7 +263,7 @@ const MedLookup = (() => {
   function show(msg) {
     const web = list.filter(x => x.src === 'rx');
     const item = (x, i) => `<button type="button" class="msug-i${x.missing ? ' miss' : ''}" data-msug="${i}">
-      <b>${h(x.name)}</b>
+      <b>${h(x.name)}${badge(x)}</b>
       <span>${x.missing ? 'أضيفي العيار بعد الاسم، مثل: ' + h(x.name) + ' 5' : x.noUnit ? 'دواء بوصفة · أضيفي الوحدة (ملغ أو مكغ) كما على العلبة' : x.rx ? 'دواء بوصفة · للجدول والتذكير فقط' : x.chips.map(h).join(' · ')}${x.src === 'rx' ? ' · ' + h(x.form) : ''}</span></button>`;
     let html = list.map(item).join('');
     if (msg) html += `<p class="hint">${h(msg)}</p>`;
@@ -218,10 +278,12 @@ const MedLookup = (() => {
     if (text.length < 2) { list = []; show(); return; }
     const p = parse(text);
     list = p ? [build(p, null, null, 'local')] : [];
+    // اسم دواء خطر غير موجود في القاموس (مثل «روكتان 20»): يُقترح كما كُتب مع علامة الخطر
+    if (!p && riskOfText(text)) list = [build({ parts: [], c: {}, rx: true, missing: false, notes: [], noUnit: /\d/.test(text) && !RE_NUM.exec(norm(text))[2] }, text.replace(/\s+/g, ' '), null, 'local')];
     const latin = /[a-z]{3,}/i.test(text);
     // البحث البعيد للأسماء غير المعروفة محليًا، أو حين يكون في النص عيار يمكن مطابقته
     const term = latin && (!p || /\d/.test(text)) ? text : '';
-    if (!term) { show(p ? '' : 'لم نعرف هذا الاسم. اكتبيه بالإنجليزية كما على العلبة، أو املئي الأرقام يدويًا.'); return; }
+    if (!term) { show(list.length ? '' : 'لم نعرف هذا الاسم. اكتبيه بالإنجليزية كما على العلبة، أو املئي الأرقام يدويًا.'); return; }
     show('جارٍ البحث في قاعدة الأدوية…');
     const my = ctl = new AbortController();
     const t = setTimeout(() => my.abort(), 7000);
@@ -237,6 +299,7 @@ const MedLookup = (() => {
       show(navigator.onLine === false ? 'لا يوجد اتصال: تعمل الأسماء الشائعة فقط دون إنترنت.' : 'تعذّر الاتصال بقاعدة الأدوية الآن. الأسماء الشائعة تعمل دون إنترنت.');
     }).finally(() => clearTimeout(t));
   }
+  const riskNote = x => { const r = risk(x); return r ? `<b class="rnote ${r.lv}">${RISK_ICON[r.lv]} ${RISK_T[r.lv]}: ${h(r.why)} لا توقفيه فجأة ولا تكمليه من نفسك، واسألي طبيبك.</b>` : ''; };
   function apply(x) {
     if (x.missing) { q().focus(); q().value = q().value.trim() + ' '; return; }
     picked = x;
@@ -249,7 +312,11 @@ const MedLookup = (() => {
     if (extra.length) lines.push('يُضاف أيضًا: ' + extra.join('، ') + '.');
     if (x.noUnit) lines.push('لم تُكتب وحدة العيار: أضيفيها إلى الاسم (ملغ أو مكغ) كما على العلبة.');
     lines.push(x.rx ? 'لن يدخل في حساب الفيتامينات، لكنه يظهر في الجدول والتذكير. حدّدي عدد الحبات ثم اضغطي «إضافة».' : 'راجعي الأرقام مع العلبة، ثم حدّدي عدد الحبات واضغطي «إضافة».');
-    note().innerHTML = lines.map(l => `<span>${h(l)}</span>`).join('');
+    note().innerHTML = riskNote(x) + lines.map(l => `<span>${h(l)}</span>`).join('');
+    if (!risk(x) && (x.rx || x.src === 'rx') && x.generic) {
+      const me = x;
+      fdaRisk(x.generic).then(r => { if (r && picked === me) { me.risk = r; note().insertAdjacentHTML('afterbegin', riskNote(me)); } });
+    }
     list = []; show();
     g('f_units').focus();
   }
@@ -266,5 +333,5 @@ const MedLookup = (() => {
     g('addForm').addEventListener('reset', () => { picked = null; list = []; show(); note().textContent = ''; });
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
-  return { pending: () => picked, parse, _build: build, _remote: remote, _fromRemoteName: fromRemoteName };
+  return { pending: () => picked, parse, risk, badge, alerts, _fdaRisk: fdaRisk, _build: build, _remote: remote, _fromRemoteName: fromRemoteName };
 })();

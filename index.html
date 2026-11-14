@@ -228,6 +228,45 @@ details.weeks summary{cursor:pointer;font-weight:600;color:var(--accent)}
     background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:8px 10px;box-shadow:0 4px 14px rgba(0,0,0,.06)}
   .mstrip .cnt{display:flex;gap:6px;flex-wrap:wrap}
 }
+.mchips{display:grid;grid-template-columns:repeat(9,minmax(0,1fr));gap:6px}
+@media (max-width:560px){.mchips{grid-template-columns:repeat(5,minmax(0,1fr))}}
+.mchip{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:6px 2px;display:flex;flex-direction:column;align-items:center;gap:0;line-height:1.3;cursor:pointer}
+.mchip small{font-size:10.5px;color:var(--muted)}
+.mchip b{font-family:var(--display);font-size:18px}
+.mchip.cur{border-color:var(--accent)}
+.mchip.cur small{color:var(--accent);font-weight:600}
+.mchip[aria-selected="true"]{background:var(--accent);border-color:var(--accent);color:var(--surface)}
+.mchip[aria-selected="true"] small{color:var(--surface)}
+.mhead{display:grid;grid-template-columns:auto minmax(0,1fr);gap:16px;align-items:center}
+.mhead .fruit{width:84px;height:84px;border-radius:50%;background:var(--accent-soft);display:flex;align-items:center;justify-content:center;font-size:44px}
+.mhead h2{font-size:21px}
+.mhead .meta{color:var(--muted);font-size:13px}
+.mhead p{font-size:14px}
+.needs{display:flex;flex-direction:column}
+.need{display:grid;grid-template-columns:28px minmax(0,1fr);gap:10px;padding:10px 0;border-top:1px solid var(--line)}
+.need:first-child{border-top:0;padding-top:0}
+.need .ic{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px}
+.need.have .ic{background:var(--ok-soft);color:var(--ok)}
+.need.miss .ic{background:var(--warn-soft);color:var(--warn)}
+.need.over .ic{background:var(--bad-soft);color:var(--bad)}
+.need .t{font-weight:600}
+.need .t small{font-weight:400;color:var(--muted);margin-inline-start:6px}
+.need .s{font-size:13.5px}
+.need.have .s{color:var(--ok)}
+.need.miss .s{color:var(--warn)}
+.need.over .s{color:var(--bad)}
+.need .w{font-size:12.5px;color:var(--muted)}
+.foods{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px}
+.fgroup{background:var(--chip);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:6px}
+.fgroup h3{font-size:14.5px}
+.fgroup .why{font-size:12px;color:var(--muted)}
+.fitems{display:flex;flex-wrap:wrap;gap:6px}
+.fitem{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:3px 10px;font-size:13px;white-space:nowrap}
+.ftips{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px}
+.ftips div{border:1px dashed var(--accent);border-radius:12px;padding:10px 14px;font-size:13.5px}
+.ftips b{display:block;color:var(--accent);font-weight:600}
+.avoid{margin:0;padding-inline-start:20px;display:flex;flex-direction:column;gap:6px;font-size:14px}
+.avoid li::marker{color:var(--bad)}
 textarea.copybox{width:100%;min-height:160px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);font:inherit;font-size:13px;padding:8px}
 </style>
 
@@ -241,6 +280,7 @@ textarea.copybox{width:100%;min-height:160px;border:1px solid var(--line);border
 
   <nav class="tabs" aria-label="أقسام التطبيق">
     <a class="tab" href="#pregnancy" data-tab="pregnancy"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16v14H4zM4 10h16M8 3v4M16 3v4" /></svg><span>حملي</span></a>
+    <a class="tab" href="#months" data-tab="months"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 7c-1.5-2-5-2.5-6.5 0S5 14 7 17.5 11 21 12 20c1 1 3 1 5-2.5S20 9.5 18.5 7 13.5 5 12 7zM12 7c0-2 1-3.5 3-4" /></svg><span>شهرًا بشهر</span></a>
     <a class="tab" href="#meds" data-tab="meds"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 15.5l7-7a3.5 3.5 0 0 0-5-5l-7 7a3.5 3.5 0 0 0 5 5zM7 9l5 5" /></svg><span>أدويتي ونتيجتها</span><b class="tbadge" id="tBadge" hidden></b></a>
     <a class="tab" href="#tips" data-tab="tips"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9V16h7v-2.1A6 6 0 0 0 12 3z" /></svg><span>نصائح</span></a>
   </nav>
@@ -275,6 +315,27 @@ textarea.copybox{width:100%;min-height:160px;border:1px solid var(--line);border
       <div class="tbl-wrap" style="margin-top:10px"><table class="ms"><thead><tr><th>الأسبوع</th><th>يبدأ في</th><th>ينتهي في</th><th>الثلث</th></tr></thead><tbody id="wkBody"></tbody></table></div>
     </details>
   </section>
+  </section>
+
+  <section class="view narrow" id="v-months" hidden>
+    <p class="intro">لكل شهر من الحمل: ما تحتاجينه من عناصر ومقارنته بصيدليتك، وخارطة الطعام المناسب، وما تتجنبينه.</p>
+    <div class="mchips" id="mChips" role="tablist" aria-label="أشهر الحمل"></div>
+    <div class="panel">
+      <div class="mhead" id="mHead"></div>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><h2>ما تحتاجينه الآن ومقارنته بصيدليتك</h2><a class="pbtn" href="#meds">تعديل أدويتي</a></div>
+      <div class="needs" id="mNeeds"></div>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><h2>خارطة الطعام</h2><span class="hint" id="mEnergy"></span></div>
+      <div class="foods" id="mFoods"></div>
+      <div class="ftips" id="mTips"></div>
+    </div>
+    <div class="panel">
+      <h2>تجنّبي في هذه الفترة</h2>
+      <ul class="avoid" id="mAvoid"></ul>
+    </div>
   </section>
 
   <section class="view" id="v-meds" hidden>
@@ -585,6 +646,7 @@ function render(){
   const isEx=JSON.stringify(state.sel)===JSON.stringify(EXAMPLE);
   $('exampleNote').querySelector('span').innerHTML=isEx?'<b>مثال محمّل:</b> صندوق حقيقي لحامل فيه 7 أصناف. امسحيه وابدئي بقائمتك.':'<b>قائمتك محفوظة</b> في هذا الجهاز فقط، ولا تُرسل إلى أي مكان.';
   save();
+  try{renderMonths()}catch(e){}
   window._last={tot,A,S};
 }
 
@@ -610,6 +672,91 @@ $('picker').addEventListener('click',e=>{
   if(inc){const id=inc.dataset.inc; state.sel[id]=Math.min((state.sel[id]||0)+1,6); render();}
   if(dec){const id=dec.dataset.dec; const v=(state.sel[id]||0)-1; if(v<=0) delete state.sel[id]; else state.sel[id]=v; render();}
 });
+/* ===== شهرًا بشهر ===== */
+const MONTHS=[
+  {m:1,w:[1,4],tri:1,fruit:'🌱',size:'بحجم بذرة سمسم',dev:'تتكوّن الخلايا الأولى وينغرس الحمل في الرحم.',mom:'قد لا تشعرين بشيء بعد. الفوليك أهم ما في هذا الشهر.'},
+  {m:2,w:[5,8],tri:1,fruit:'🫐',size:'بحجم حبة توت',dev:'يبدأ القلب بالنبض وتتكوّن الأعضاء الرئيسية.',mom:'الغثيان والتعب شائعان. وجبات صغيرة متكررة تساعد.'},
+  {m:3,w:[9,13],tri:1,fruit:'🍋',size:'بحجم ليمونة',dev:'تكتمل الأعضاء ويتحرك الجنين دون أن تشعري به.',mom:'موعد سونار الشفافية القفوية وتحاليل الثلث الأول.'},
+  {m:4,w:[14,17],tri:2,fruit:'🍎',size:'بحجم تفاحة',dev:'تقوى العظام ويبدأ الجنين بسماع الأصوات.',mom:'يخف الغثيان غالبًا ويعود النشاط.'},
+  {m:5,w:[18,22],tri:2,fruit:'🍌',size:'بحجم موزة',dev:'تشعرين بأولى الحركات، ويُعرف الجنس غالبًا.',mom:'موعد السونار التفصيلي.'},
+  {m:6,w:[23,27],tri:2,fruit:'🌽',size:'بحجم كوز ذرة',dev:'تنمو الرئتان ويزداد الوزن بسرعة.',mom:'موعد اختبار تحمل السكر.'},
+  {m:7,w:[28,31],tri:3,fruit:'🍆',size:'بحجم باذنجانة، نحو كيلو',dev:'يفتح عينيه ويتعرّف على صوتك.',mom:'تحليل الدم من جديد، وابدئي التفكير بحقيبة الولادة.'},
+  {m:8,w:[32,35],tri:3,fruit:'🍍',size:'بحجم أناناسة، نحو كيلوين',dev:'يكتسب الدهون ويستعد للخروج.',mom:'قد يزيد الإمساك وحرقة المعدة.'},
+  {m:9,w:[36,40],tri:3,fruit:'🍉',size:'بحجم بطيخة صغيرة، نحو 3 كيلو',dev:'يكتمل نموه وينزل رأسه استعدادًا للولادة.',mom:'متابعة أسبوعية. وجهّزي ما تحتاجينه للمستشفى.'}
+];
+const NEEDS={
+  1:[['folic','0.4 ملغ يوميًا (5 ملغ بوصفة للحالات الخاصة)','يحمي الجنين من تشوهات العمود الفقري، وأهميته القصوى في هذه الأشهر.'],
+     ['iodine','150 إلى 250 مكغ','لنمو دماغ الجنين وغدته الدرقية.'],
+     ['vitD','600 إلى 1000 وحدة','لامتصاص الكالسيوم ومناعتك.'],
+     ['iron','نحو 30 ملغ وقائيًا','عادة ضمن فيتامين الحمل، والجرعة العلاجية حسب التحليل.']],
+  2:[['iron','30 إلى 60 ملغ، والطبيب يحددها حسب الهيموغلوبين','حجم الدم يزداد كثيرًا في هذه الأشهر.'],
+     ['calcium','نحو 1000 ملغ من الطعام والمكملات','لبناء عظام الجنين وأسنانه.'],
+     ['omega3','200 ملغ DHA على الأقل','لنمو الدماغ والعينين.'],
+     ['vitD','600 إلى 1000 وحدة','لامتصاص الكالسيوم.'],
+     ['iodine','150 إلى 250 مكغ','يستمر احتياجه طوال الحمل.'],
+     ['folic','0.4 ملغ','يستمر بجرعة عادية.']],
+  3:[['iron','حسب الهيموغلوبين والفيريتين','لتجنب فقر الدم قبل الولادة.'],
+     ['calcium','نحو 1000 ملغ','عظام الجنين تتكلس بسرعة في الأشهر الأخيرة.'],
+     ['omega3','200 ملغ DHA على الأقل','نمو الدماغ في أسرع مراحله.'],
+     ['vitD','600 إلى 1000 وحدة','للعظام والمناعة.'],
+     ['iodine','150 إلى 250 مكغ','يستمر حتى نهاية الرضاعة.'],
+     ['folic','0.4 ملغ','يستمر بجرعة عادية.']]
+};
+const FOODS={
+  1:[{t:'لحمض الفوليك',w:'يكمّل الحبة ولا يغني عنها',f:['سبانخ وملوخية','عدس وحمص','فول','بقدونس','برتقال','خبز وحبوب مدعّمة']},
+     {t:'لليود',w:'',f:['ملح مدعّم باليود','لبن وحليب','بيض مطبوخ جيدًا']},
+     {t:'لتخفيف الغثيان',w:'وجبات صغيرة كل ساعتين إلى ثلاث',f:['زنجبيل','بسكويت مالح صباحًا','خبز محمص','موز','ليمون']},
+     {t:'للبروتين',w:'',f:['بيض','دجاج','لبنة مبسترة','بقوليات']}],
+  2:[{t:'للحديد',w:'كُليه مع ليمون أو برتقال، وبعيدًا عن الشاي',f:['لحم أحمر','كبدة دجاج (مرة في الأسبوع)','عدس','سبانخ مع ليمون','دبس العنب والخرنوب','مشمش مجفف']},
+     {t:'للكالسيوم',w:'',f:['لبن وحليب','لبنة وجبنة مبسترة','طحينة وسمسم','لوز','سردين بعظمه']},
+     {t:'لأوميغا 3',w:'مرتين في الأسبوع',f:['سردين','سلمون','جوز','بذور الكتان']},
+     {t:'لفيتامين D',w:'',f:['شمس الصباح 15 دقيقة','صفار البيض','سمك دهني']}],
+  3:[{t:'للحديد والطاقة',w:'',f:['لحم أحمر','عدس','دبس','تمر','مشمش مجفف']},
+     {t:'للكالسيوم',w:'',f:['لبن','لبنة مبسترة','طحينة','لوز']},
+     {t:'للإمساك',w:'مع 8 إلى 10 أكواب ماء يوميًا',f:['خبز أسمر وبرغل','خضار مطبوخة','تين وقراصية','شوفان']},
+     {t:'لحرقة المعدة',w:'وجبات صغيرة، ولا تستلقي بعد الأكل مباشرة',f:['حليب بارد','موز','شوفان']}]
+};
+const ENERGY={1:'لا تحتاجين سعرات إضافية',2:'نحو 340 سعرة إضافية يوميًا (مثل سندويشة لبنة وكوب حليب)',3:'نحو 450 سعرة إضافية يوميًا'};
+const MTIPS={
+  1:[['الماء','8 أكواب يوميًا على الأقل، أكثر مع القيء.'],['الكافيين','فنجانان من القهوة يوميًا على الأكثر.']],
+  2:[['الحديد والشاي','اشربي الشاي بعد الأكل بساعة على الأقل، لأنه يقلل امتصاص الحديد.'],['الوزن','الزيادة المعتادة نحو نصف كيلو أسبوعيًا.']],
+  3:[['التمر','تشير دراسات إلى أن 6 تمرات يوميًا في آخر 4 أسابيع قد تسهّل الولادة. اسألي طبيبتك.'],['السكر','إن كان عندك سكري الحمل فاختاري الخبز الأسمر وقلّلي الحلويات والعصائر.']]
+};
+const AVOID_ALL=['الأجبان والحليب غير المبسترة (البلدي غير المغلي)','اللحم والبيض النيئ أو غير المطبوخ جيدًا','الأسماك الكبيرة الغنية بالزئبق (القرش وسمك السيف والتونة الكبيرة)','الكحول والتدخين والنرجيلة، وتجنّبي التدخين حولك','أي دواء أو عشبة جديدة دون سؤال الطبيب'];
+const AVOID_T={1:['الكبد بكثرة ومكملات فيتامين A (الريتينول)','الأعشاب القوية مثل المرمية بكميات كبيرة'],2:['الإفراط في الحلويات والمشروبات المحلاة'],3:['مسكنات الإيبوبروفين والديكلوفيناك بعد الأسبوع 20','الوجبات الكبيرة قبل النوم']};
+let monthSel=null;
+function curMonth(){
+  const L=lmpFrom(); if(L==null) return null;
+  const wk=Math.floor((todayU()-L)/DAY/7)+1; if(wk<1) return null;
+  const m=MONTHS.find(x=>wk>=x.w[0]&&wk<=x.w[1]); return m?m.m:(wk>40?9:null);
+}
+function renderMonths(){
+  if(!$('mChips')) return;
+  const cur=curMonth(), sel=monthSel||cur||1, M=MONTHS[sel-1], L=lmpFrom();
+  $('mChips').innerHTML=MONTHS.map(x=>`<button type="button" class="mchip${x.m===cur?' cur':''}" role="tab" aria-selected="${x.m===sel}" data-month="${x.m}"><small>${x.m===cur?'الآن':'الشهر'}</small><b class="num">${x.m}</b></button>`).join('');
+  const range = L!=null ? `${fmtShort(L+(M.w[0]-1)*7*DAY)} إلى ${fmtShort(L+(M.w[1]*7-1)*DAY)}` : '';
+  const triName=['','الأول','الثاني','الثالث'][M.tri];
+  $('mHead').innerHTML=`<div class="fruit" aria-hidden="true">${M.fruit}</div><div style="display:flex;flex-direction:column;gap:4px;min-width:0">
+    <h2>الشهر ${M.m}: الجنين ${M.size}</h2>
+    <span class="meta">الأسابيع <span class="num">${M.w[0]}–${M.w[1]}</span> · الثلث ${triName}${range?' · '+range:''}${dueState.example?' · حسب التاريخ المثال':''}</span>
+    <p>${M.dev}</p><p class="meta">${M.mom}</p></div>`;
+  const {tot,src}=compute();
+  $('mNeeds').innerHTML=NEEDS[M.tri].map(([k,target,why])=>{
+    const v=tot[k]||0, names=[...new Set(src[k]||[])], st=v?status(k,v):'none';
+    const cls=!v?'miss':st==='bad'?'over':'have';
+    const ic=cls==='have'?'✓':cls==='over'?'!':'؟';
+    const msg=!v?'غير موجود في صيدليتك، اسألي طبيبك عنه'
+      : cls==='over'?`موجود بكمية ${fmt(v)} ${N[k].u}، وهي فوق الحد. راجعي «أدويتي»`
+      : `تأخذينه من: ${names.join('، ')} (المجموع ${fmt(v)} ${N[k].u})`;
+    return `<div class="need ${cls}"><span class="ic" aria-hidden="true">${ic}</span><div><div class="t">${N[k].l}<small>المطلوب: ${target}</small></div><div class="s">${esc(msg)}</div><div class="w">${why}</div></div></div>`;
+  }).join('');
+  $('mEnergy').textContent=ENERGY[M.tri];
+  $('mFoods').innerHTML=FOODS[M.tri].map(g=>`<div class="fgroup"><h3>${g.t}</h3>${g.w?`<span class="why">${g.w}</span>`:''}<div class="fitems">${g.f.map(x=>`<span class="fitem">${x}</span>`).join('')}</div></div>`).join('');
+  $('mTips').innerHTML=MTIPS[M.tri].map(([a,b])=>`<div><b>${a}</b>${b}</div>`).join('');
+  $('mAvoid').innerHTML=AVOID_T[M.tri].concat(AVOID_ALL).map(x=>`<li>${x}</li>`).join('');
+}
+document.addEventListener('click',e=>{const c=e.target.closest('[data-month]'); if(c){monthSel=+c.dataset.month; renderMonths();}});
+
 /* ===== حاسبة موعد الولادة ===== */
 const DAY=86400000;
 const parseD=s=>{const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(s||''); return m?Date.UTC(+m[1],+m[2]-1,+m[3]):null;};
@@ -673,6 +820,7 @@ function renderDue(){
   }
   $('wkBody').innerHTML=wk;
   window._due={edd,gaTxt};
+  if(typeof renderMonths==='function') renderMonths();
 }
 $('dueForm').addEventListener('input',()=>{
   dueState={method:$('d_method').value,date:$('d_date').value,cycle:$('d_cycle').value,usw:$('d_usw').value,usd:$('d_usd').value};
@@ -750,7 +898,7 @@ $('addForm').addEventListener('submit',async e=>{
   state.custom.push({id,name,sub:'صنف مضاف',form:'حبة',cat:$('f_cat').value,def:units,c,img,why:'صنف أضفتِه من علبته.'});
   state.sel[id]=units; e.target.reset(); $('addBox').open=false; render(); toast('أُضيف الصنف');
 });
-const TABS=['pregnancy','meds','tips'];
+const TABS=['pregnancy','months','meds','tips'];
 function route(){
   let t=(location.hash||'').slice(1); const toRes=t==='result'; if(toRes) t='meds'; if(!TABS.includes(t)) t='pregnancy';
   TABS.forEach(k=>{$('v-'+k).hidden=k!==t;});

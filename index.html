@@ -359,6 +359,15 @@ header.top{align-items:center}
 .confirm h2{font-size:19px}
 .cbtns{justify-content:center;width:100%}
 .cbtns .btn{flex:1;padding:10px 14px;font-size:15px}
+.wstep{display:flex;flex-direction:column;gap:12px;text-align:center;align-items:stretch}
+.wstep h2{font-size:21px}
+#wMom{text-align:start}
+.wheart{width:72px;height:72px;border-radius:50%;background:var(--accent-soft);display:flex;align-items:center;justify-content:center;font-size:36px;align-self:center}
+.roles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.role{border:2px solid var(--line);background:#fff;border-radius:16px;padding:14px 6px;display:flex;flex-direction:column;align-items:center;gap:6px;font-weight:700;font-size:15px}
+.role span{font-size:34px;line-height:1}
+.role:hover,.role:focus-visible{border-color:var(--accent);background:var(--accent-soft)}
+.wstep .pbtn{align-self:center}
 textarea.copybox{width:100%;min-height:160px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink);font:inherit;font-size:13px;padding:8px}
 </style>
 
@@ -558,8 +567,35 @@ textarea.copybox{width:100%;min-height:160px;border:1px solid var(--line);border
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <div class="viewer" id="welcome" hidden role="dialog" aria-modal="true" aria-labelledby="wTitle">
   <figure class="welcome">
-    <h2 id="wTitle">أهلًا بك</h2>
-    <p class="hint" style="font-size:14px">لنحسب موعد ولادتك ونرتّب محطات حملك، أدخلي تاريخ الحمل. يبقى التاريخ في جهازك فقط.</p>
+    <div id="wWho" class="wstep">
+      <div class="wheart" aria-hidden="true">💗</div>
+      <h2 id="wTitle">أهلًا بكم في «ضيفنا الجديد»</h2>
+      <p class="hint" style="font-size:14px">من يستخدم هذا الجهاز؟</p>
+      <div class="roles">
+        <button type="button" class="role" data-role="mom"><span aria-hidden="true">🤰</span>أنا الأم</button>
+        <button type="button" class="role" data-role="dad"><span aria-hidden="true">👨</span>أنا الأب</button>
+        <button type="button" class="role" data-role="kid"><span aria-hidden="true">🧒</span>أنا طفل</button>
+      </div>
+    </div>
+    <div id="wDad" class="wstep" hidden>
+      <div class="wheart" aria-hidden="true">👨</div>
+      <h2>أهلًا يا أبا الضيف الجديد</h2>
+      <p class="hint" style="font-size:14px">اربط جهازك بحساب العائلة لترى موعد الولادة والأدوية ومهام اليوم كما تسجّلها الأم، أولًا بأول.</p>
+      <button type="button" class="btn primary big" id="wDadAcct">ربط جهازي بحساب العائلة</button>
+      <button type="button" class="btn" id="wDadDate">أعرف تاريخ الحمل وسأدخله</button>
+      <button type="button" class="pbtn" data-wback>رجوع</button>
+    </div>
+    <div id="wKid" class="wstep" hidden>
+      <div class="wheart" aria-hidden="true">🎈</div>
+      <h2>أهلًا يا بطل!</h2>
+      <p style="font-size:15px">ماما وبابا ينتظران ضيفًا جديدًا 💗 وقريبًا تكون لك صفحة خاصة ترى فيها كيف يكبر في بطن ماما كل أسبوع.</p>
+      <p class="hint" id="wKidHint">اطلب من بابا أو ماما رمز الانضمام من مجلس العائلة.</p>
+      <div class="btns cbtns"><button type="button" class="btn primary" id="wKidCode">عندي رمز</button><button type="button" class="btn" id="wKidOk">حسنًا</button></div>
+      <button type="button" class="pbtn" data-wback id="wKidBack">رجوع</button>
+    </div>
+    <div id="wMom" class="wstep" hidden>
+    <h2>متى بدأ الحمل؟</h2>
+    <p class="hint" style="font-size:14px">لنحسب موعد الولادة ونرتّب محطات الحمل، أدخلي تاريخ الحمل. يبقى التاريخ في جهازك، أو في حساب العائلة إن ربطتِه.</p>
     <form class="dform" id="wForm">
       <label>أعرف تاريخ<select id="w_method">
         <option value="lmp">أول يوم من آخر دورة</option>
@@ -577,7 +613,9 @@ textarea.copybox{width:100%;min-height:160px;border:1px solid var(--line);border
         <button class="btn" type="button" id="wSkip">لاحقًا</button>
       </div>
       <button class="pbtn" type="button" id="wAcct" style="align-self:flex-start">عندكم حساب في تطبيقات العائلة؟ ادخلي من هنا</button>
+      <button type="button" class="pbtn" data-wback style="align-self:flex-start">رجوع</button>
     </form>
+    </div>
   </figure>
 </div>
 <div class="viewer" id="acct" hidden role="dialog" aria-modal="true" aria-labelledby="aTitle">
@@ -988,7 +1026,7 @@ renderDue();
 const wSync=()=>{const m=$('w_method').value; $('w_us').hidden=m!=='us'; $('w_dateLabel').textContent={lmp:'أول يوم من آخر دورة',conc:'تاريخ الإخصاب',us:'تاريخ السونار'}[m];};
 $('w_method').addEventListener('change',wSync);
 $('w_date').max=isoD(todayU());
-const closeWelcome=()=>{$('welcome').hidden=true; try{localStorage.setItem(KEY+'-welcomed','1')}catch(e){}};
+const closeWelcome=()=>{$('welcome').hidden=true; welcomed=true; try{localStorage.setItem(KEY+'-welcomed','1')}catch(e){}};
 $('wSkip').onclick=closeWelcome;
 $('wForm').addEventListener('submit',e=>{
   e.preventDefault();
@@ -1003,8 +1041,31 @@ $('wForm').addEventListener('submit',e=>{
   closeWelcome(); renderDue(); toast('حُسب موعدك');
   location.hash='pregnancy'; route();
 });
-let welcomed=false; try{welcomed=localStorage.getItem(KEY+'-welcomed')==='1'}catch(e){}
-if(firstVisit&&!welcomed){$('welcome').hidden=false; setTimeout(()=>$('w_date').focus(),50);}
+var welcomed=false; try{welcomed=localStorage.getItem(KEY+'-welcomed')==='1'}catch(e){}
+// أول دخول: نسأل من يستخدم الجهاز قبل أي سؤال عن الحمل، وننتظر أولًا أن يتضح ارتباط الجهاز بالعائلة
+function wShow(step){ ['wWho','wDad','wKid','wMom'].forEach(k=>$(k).hidden=k!==step); $('welcome').hidden=false;
+  const f=$(step).querySelector(step==='wMom'?'#w_date':'button'); if(f) setTimeout(()=>f.focus(),50); }
+function maybeWelcome(){
+  if(!firstVisit||welcomed||!$('welcome').hidden) return;
+  if(/join=/i.test(location.hash)||!$('acct').hidden) return;
+  const st=Cloud.status;
+  if(st==='loading'||st==='linking') return;
+  if((st==='ok'||st==='offline')&&!dueState.example) return;
+  if(st==='kid'){ $('wKidHint').hidden=true; $('wKidCode').hidden=true; $('wKidBack').hidden=true; wShow('wKid'); return; }
+  wShow('wWho');
+}
+$('welcome').addEventListener('click',e=>{
+  const r=e.target.closest('[data-role]');
+  if(r){ try{localStorage.setItem(KEY+'-role',r.dataset.role)}catch(e){}
+    wShow(r.dataset.role==='mom'?'wMom':r.dataset.role==='dad'?'wDad':'wKid'); return; }
+  if(e.target.closest('[data-wback]')) wShow('wWho');
+});
+$('wDadAcct').onclick=()=>{closeWelcome(); openAcct();};
+$('wDadDate').onclick=()=>wShow('wMom');
+$('wKidCode').onclick=()=>{closeWelcome(); openAcct();};
+$('wKidOk').onclick=closeWelcome;
+Cloud.on(what=>{ if(what==='status') setTimeout(maybeWelcome,0); });
+setTimeout(maybeWelcome,0); setTimeout(maybeWelcome,3000);
 
 function openView(id){
   const p=byId(id); if(!p) return; const src=imgOf(p);

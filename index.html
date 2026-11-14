@@ -5,24 +5,24 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=Readex+Pro:wght@500;700&display=swap">
 <style>
-/* Layout: two working columns (picker | verdict + schedule), stacking on phones. A pharmacy-shelf calm: teal ink, paper-white cards, semantic stripes for risk. */
+/* Layout: tabs; meds view is two columns (picker | live result), stacking on phones. Soft rose palette, white cards, semantic stripes for risk. */
 :root{
-  --bg:#f2f6f5; --surface:#ffffff; --ink:#14302a; --muted:#5a6e69; --line:#d8e3df;
-  --accent:#0d6b59; --accent-soft:#e0efea; --chip:#edf3f1;
+  --bg:#fdf4f7; --surface:#ffffff; --ink:#3b1d2b; --muted:#7b5a69; --line:#f1d9e3;
+  --accent:#b5306a; --accent-soft:#fce4ee; --chip:#f9edf2;
   --ok:#2c8650; --ok-soft:#e2f3e7; --warn:#a96f12; --warn-soft:#fbefd8; --bad:#bf3a2b; --bad-soft:#fbe4e0;
-  --info:#2f6690; --info-soft:#e3eef7; --scrim:rgba(8,20,17,.62);
+  --info:#2f6690; --info-soft:#e3eef7; --scrim:rgba(45,12,28,.58);
   --display:"Readex Pro","IBM Plex Sans Arabic",system-ui,sans-serif;
   --body:"IBM Plex Sans Arabic",system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --bg:#0e1614; --surface:#15201d; --ink:#e2ece9; --muted:#97aba5; --line:#26342f;
-  --accent:#4cc2a6; --accent-soft:#143831; --chip:#1c2a26;
+  --bg:#1a1015; --surface:#25161e; --ink:#f4e6ec; --muted:#bc9cab; --line:#3b2531;
+  --accent:#f28cb6; --accent-soft:#4a2137; --chip:#2f1d26;
   --ok:#5cc684; --ok-soft:#14301f; --warn:#e2a948; --warn-soft:#382a12; --bad:#ef6e60; --bad-soft:#3b1a16;
   --info:#7fb6e0; --info-soft:#152a3b; color-scheme:dark;
 }}
 :root[data-theme="dark"]{
-  --bg:#0e1614; --surface:#15201d; --ink:#e2ece9; --muted:#97aba5; --line:#26342f;
-  --accent:#4cc2a6; --accent-soft:#143831; --chip:#1c2a26;
+  --bg:#1a1015; --surface:#25161e; --ink:#f4e6ec; --muted:#bc9cab; --line:#3b2531;
+  --accent:#f28cb6; --accent-soft:#4a2137; --chip:#2f1d26;
   --ok:#5cc684; --ok-soft:#14301f; --warn:#e2a948; --warn-soft:#382a12; --bad:#ef6e60; --bad-soft:#3b1a16;
   --info:#7fb6e0; --info-soft:#152a3b; color-scheme:dark;
 }

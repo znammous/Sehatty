@@ -27,6 +27,7 @@ const Cloud = (() => {
   let status = 'loading';
   let fb = null, user = null, fid = null, joining = false, parent = false;
   let memberData = null, dataUnsub = null, guardName = '';
+  let extraUnsubs = [];   // المهام اليومية والسجل والمواعيد
   const listeners = [];
   const notify = (what, x) => listeners.forEach(fn => fn(what, x));
   const set = s => { status = s; notify('status'); };
@@ -57,9 +58,11 @@ const Cloud = (() => {
   }
 
   const famDoc = (...p) => fb.fs.doc(fb.db, 'families', fid, ...p);
+  const famCol = (...p) => fb.fs.collection(fb.db, 'families', fid, ...p);
 
   function stopAll() {
     if (dataUnsub) { dataUnsub(); dataUnsub = null; }
+    extraUnsubs.forEach(u => u()); extraUnsubs = [];
     memberData = null; parent = false; guardName = '';
   }
 
@@ -90,6 +93,50 @@ const Cloud = (() => {
       if (snap.metadata.hasPendingWrites) return;   // صدى ما كتبناه نحن
       notify('data', { exists: snap.exists(), data: snap.exists() ? snap.data() : null, fromCache: snap.metadata.fromCache });
     }, () => set('offline'));
+    watchExtra();
+  }
+
+  // مهام كل يوم في sehattyDays/{التاريخ}، والسجل في sehattyLog، والمواعيد في sehattyAppts.
+  // مستندات منفصلة حتى لا تمحو كتابةُ أحد الوالدين كتابةَ الآخر في نفس اللحظة.
+  function watchExtra() {
+    const fs = fb.fs, since = new Date(Date.now() - 45 * 864e5).toISOString().slice(0, 10);
+    extraUnsubs.push(fs.onSnapshot(fs.query(famCol('sehattyDays'), fs.where('date', '>=', since)), snap => {
+      const days = {}; snap.docs.forEach(d => { days[d.id] = d.data(); });
+      notify('days', days);
+    }, () => {}));
+    extraUnsubs.push(fs.onSnapshot(fs.query(famCol('sehattyLog'), fs.orderBy('t', 'desc'), fs.limit(60)), snap => {
+      notify('log', snap.docs.map(d => ({ id: d.id, ...d.data() })));
+    }, () => {}));
+    extraUnsubs.push(fs.onSnapshot(famCol('sehattyAppts'), snap => {
+      notify('appts', { list: snap.docs.map(d => ({ id: d.id, ...d.data() })), fromCache: snap.metadata.fromCache });
+    }, () => {}));
+  }
+  const live = () => !!(fb && fid && parent);
+  function markTask(date, id, on, extra) {
+    if (!live()) return Promise.resolve(false);
+    const ref = famDoc('sehattyDays', date);
+    const p = on
+      ? fb.fs.setDoc(ref, { date, ...(extra || {}), done: { [id]: { at: Date.now(), by: who() } } }, { merge: true })
+      : fb.fs.updateDoc(ref, { ['done.' + id]: fb.fs.deleteField(), ...(extra || {}) });
+    return p.then(() => true).catch(() => false);
+  }
+  function setDay(date, patch) {
+    if (!live()) return Promise.resolve(false);
+    return fb.fs.setDoc(famDoc('sehattyDays', date), { date, ...patch }, { merge: true }).then(() => true).catch(() => false);
+  }
+  function addLog(text, kind) {
+    if (!live()) return Promise.resolve(false);
+    return fb.fs.addDoc(famCol('sehattyLog'), { t: Date.now(), by: who(), uid: user.uid, text: String(text).slice(0, 200), kind: kind || '' })
+      .then(() => true).catch(() => false);
+  }
+  function saveAppt(a) {
+    if (!live()) return Promise.resolve(false);
+    const { id, ...rest } = a;
+    return fb.fs.setDoc(famDoc('sehattyAppts', id), rest).then(() => true).catch(() => false);
+  }
+  function deleteAppt(id) {
+    if (!live()) return Promise.resolve(false);
+    return fb.fs.deleteDoc(famDoc('sehattyAppts', id)).then(() => true).catch(() => false);
   }
 
   async function linkFromApps(u) {
@@ -167,14 +214,17 @@ const Cloud = (() => {
       .then(() => true).catch(() => false);
   }
 
+  function who() {
+    if (!user) return '';
+    if (!user.isAnonymous) return user.displayName || user.email || 'ولي الأمر';
+    return guardName || (memberData && memberData.name) || '';
+  }
+
   return {
-    start, signIn, join, signOut, save,
+    start, signIn, join, signOut, save, markTask, setDay, addLog, saveAppt, deleteAppt,
+    get live() { return live(); },
     on: fn => listeners.push(fn),
     get status() { return status; },
-    get who() {
-      if (!user) return '';
-      if (!user.isAnonymous) return user.displayName || user.email || 'ولي الأمر';
-      return guardName || (memberData && memberData.name) || '';
-    },
+    get who() { return who(); },
   };
 })();

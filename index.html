@@ -299,6 +299,52 @@ header.top{align-items:center}
 .abody .who{background:var(--ok-soft);color:var(--ok);border-radius:10px;padding:10px 12px;font-weight:600}
 #jCode{letter-spacing:.2em;text-transform:uppercase;direction:ltr;text-align:center;font-variant-numeric:tabular-nums}
 @media (max-width:560px){.acct span{max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}}
+.tab .sm{display:none}
+@media (max-width:700px){.tab .lg{display:none}.tab .sm{display:inline}}
+.tbadge.soft{background:var(--accent)}
+.tab[aria-current="page"] .tbadge{background:#fff;color:var(--accent)}
+.thead{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:14px;align-items:center}
+.thead .fruit{width:64px;height:64px;border-radius:50%;background:var(--accent-soft);display:flex;align-items:center;justify-content:center;font-size:34px}
+.thead h2{font-size:20px}
+.thead .meta{color:var(--muted);font-size:13.5px}
+.ring{--p:0;width:72px;height:72px;border-radius:50%;background:conic-gradient(var(--accent) calc(var(--p)*1%),var(--chip) 0);display:flex;align-items:center;justify-content:center}
+.ring b{width:56px;height:56px;border-radius:50%;background:var(--surface);display:flex;align-items:center;justify-content:center;font-size:15px;font-variant-numeric:tabular-nums;direction:ltr}
+@media (max-width:560px){.thead{grid-template-columns:auto minmax(0,1fr)}.thead .ring{grid-column:1/-1;justify-self:center}}
+.tlist{display:flex;flex-direction:column;gap:6px}
+.tgroup{font-size:12.5px;color:var(--muted);font-weight:700;margin-top:8px}
+.tgroup:first-child{margin-top:0}
+.task{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:center;padding:9px 12px;border:1px solid var(--line);border-radius:12px;background:#fff;cursor:pointer}
+.task input{width:22px;height:22px;accent-color:var(--accent);margin:0}
+.task .tt{font-weight:600;line-height:1.35}
+.task .tt small{display:block;font-weight:400;color:var(--muted);font-size:12.5px}
+.task .by{font-size:11.5px;color:var(--ok);white-space:nowrap}
+.task.done{background:var(--ok-soft);border-color:transparent}
+.task.done .tt{text-decoration:line-through;text-decoration-color:var(--muted);color:var(--muted)}
+.task.late{border-color:var(--bad)}
+.water{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:9px 12px;border:1px solid var(--line);border-radius:12px;background:#fff}
+.water .tt{font-weight:600;flex:1;min-width:120px}
+.cups{display:flex;gap:4px;flex-wrap:wrap;direction:rtl}
+.cup{width:30px;height:34px;border:2px solid var(--info);border-top-width:0;border-radius:0 0 9px 9px;background:#fff;padding:0;position:relative;overflow:hidden}
+.cup.full{background:linear-gradient(0deg,#9fd3f5 0 78%,#fff 78%)}
+.cup:focus-visible{outline:2px solid var(--accent)}
+.uplist{display:flex;flex-direction:column}
+.up{display:grid;grid-template-columns:62px minmax(0,1fr) auto;gap:12px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
+.up:first-child{border-top:0}
+.up .when{text-align:center;border-radius:10px;background:var(--accent-soft);padding:4px 2px;line-height:1.2}
+.up .when b{display:block;font-size:20px;color:var(--accent)}
+.up .when small{font-size:11px;color:var(--muted)}
+.up .tt{font-weight:600}
+.up .tt small{display:block;font-weight:400;color:var(--muted);font-size:12.5px}
+.up .kind{font-size:11px;border-radius:20px;padding:1px 8px;background:var(--chip);color:var(--muted);margin-inline-start:6px;font-weight:600}
+.up .del{border:0;background:none;color:var(--muted);font-size:18px;padding:4px 8px}
+.log{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.log li{display:grid;grid-template-columns:28px minmax(0,1fr) auto;gap:10px;align-items:center;padding:8px 0;border-top:1px solid var(--line);font-size:14px}
+.log li:first-child{border-top:0}
+.log .ic{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--ok-soft);color:var(--ok);font-weight:700;font-size:13px}
+.log .ic.appt{background:var(--accent-soft);color:var(--accent)}
+.log .ic.water{background:var(--info-soft);color:var(--info)}
+.log time{font-size:12px;color:var(--muted);white-space:nowrap}
+.log b{font-weight:700}
 textarea.copybox{width:100%;min-height:160px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink);font:inherit;font-size:13px;padding:8px}
 </style>
 
@@ -321,13 +367,42 @@ textarea.copybox{width:100%;min-height:160px;border:1px solid var(--line);border
   </header>
 
   <nav class="tabs" aria-label="أقسام التطبيق">
+    <a class="tab" href="#today" data-tab="today"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l2 2 4-4M5 4h14a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1z" /></svg><span>اليوم</span><b class="tbadge soft" id="todayBadge" hidden></b></a>
     <a class="tab" href="#pregnancy" data-tab="pregnancy"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16v14H4zM4 10h16M8 3v4M16 3v4" /></svg><span>حملي</span></a>
-    <a class="tab" href="#months" data-tab="months"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 7c-1.5-2-5-2.5-6.5 0S5 14 7 17.5 11 21 12 20c1 1 3 1 5-2.5S20 9.5 18.5 7 13.5 5 12 7zM12 7c0-2 1-3.5 3-4" /></svg><span>شهرًا بشهر</span></a>
-    <a class="tab" href="#meds" data-tab="meds"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 15.5l7-7a3.5 3.5 0 0 0-5-5l-7 7a3.5 3.5 0 0 0 5 5zM7 9l5 5" /></svg><span>أدويتي ونتيجتها</span><b class="tbadge" id="tBadge" hidden></b></a>
+    <a class="tab" href="#months" data-tab="months"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 7c-1.5-2-5-2.5-6.5 0S5 14 7 17.5 11 21 12 20c1 1 3 1 5-2.5S20 9.5 18.5 7 13.5 5 12 7zM12 7c0-2 1-3.5 3-4" /></svg><span><span class="lg">شهرًا بشهر</span><span class="sm">شهريًا</span></span></a>
+    <a class="tab" href="#meds" data-tab="meds"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 15.5l7-7a3.5 3.5 0 0 0-5-5l-7 7a3.5 3.5 0 0 0 5 5zM7 9l5 5" /></svg><span><span class="lg">أدويتي ونتيجتها</span><span class="sm">أدويتي</span></span><b class="tbadge" id="tBadge" hidden></b></a>
     <a class="tab" href="#tips" data-tab="tips"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9V16h7v-2.1A6 6 0 0 0 12 3z" /></svg><span>نصائح</span></a>
   </nav>
 
-  <section class="view" id="v-pregnancy">
+  <section class="view narrow" id="v-today" hidden>
+    <div class="panel thead" id="tHead"></div>
+    <div class="panel">
+      <div class="panel-head"><h2>مهام اليوم</h2><span class="hint" id="tCount"></span></div>
+      <div id="tList" class="tlist"></div>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><h2>القادم</h2><button class="btn" id="apptAdd" type="button">+ موعد أو مهمة</button></div>
+      <form class="dform apptf" id="apptForm" hidden>
+        <label>العنوان<input id="a_title" maxlength="80" required placeholder="مثل: موعد د. سلمى، أو حجز السونار"></label>
+        <div class="pair">
+          <label>النوع<select id="a_type"><option value="doc">موعد طبيب</option><option value="lab">تحليل</option><option value="us">سونار</option><option value="task">مهمة</option></select></label>
+          <label>التاريخ<input id="a_date" type="date" required></label>
+        </div>
+        <div class="pair">
+          <label>الساعة (اختياري)<input id="a_time" type="time"></label>
+          <label>ملاحظة (اختياري)<input id="a_note" maxlength="120" placeholder="مثل: صائمة 8 ساعات"></label>
+        </div>
+        <div class="btns"><button class="btn primary" type="submit">حفظ</button><button class="btn" type="button" id="apptCancel">إلغاء</button></div>
+      </form>
+      <div id="tUp" class="uplist"></div>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><h2>آخر النشاطات</h2><span class="hint" id="tStreak"></span></div>
+      <ul id="tLog" class="log"></ul>
+    </div>
+  </section>
+
+  <section class="view" id="v-pregnancy" hidden>
     <p class="intro">احسبي موعد ولادتك، واعرفي متى يحين كل فحص مهم.</p>
   <section class="panel" id="dueBox">
     <div class="panel-head"><h2>موعد الولادة</h2><span class="hint" id="dueHint"></span></div>
@@ -697,6 +772,7 @@ function render(){
   $('exampleNote').querySelector('span').innerHTML=isEx?'<b>مثال محمّل:</b> صندوق حقيقي لحامل فيه 7 أصناف. امسحيه وابدئي بقائمتك.':'<b>قائمتك محفوظة</b> في هذا الجهاز فقط، ولا تُرسل إلى أي مكان.';
   save();
   try{renderMonths()}catch(e){}
+  try{renderToday()}catch(e){}
   window._last={tot,A,S};
 }
 
@@ -871,6 +947,7 @@ function renderDue(){
   $('wkBody').innerHTML=wk;
   window._due={edd,gaTxt};
   if(typeof renderMonths==='function') renderMonths();
+  try{renderToday()}catch(e){}
   pushCloud();
 }
 $('dueForm').addEventListener('input',()=>{
@@ -1047,11 +1124,132 @@ Cloud.on((what,x)=>{
 });
 Cloud.start();
 
-const TABS=['pregnancy','months','meds','tips'];
+/* ===== اليوم: المهام والقادم والسجل ===== */
+// بلا حساب: تُحفظ في الجهاز. مع حساب العائلة: sehattyDays و sehattyLog و sehattyAppts تحت families/{fid}.
+var TS={days:{},log:[],appts:[]}, tsCloud=false, apptsSeeded=false;
+try{const t=JSON.parse(localStorage.getItem(KEY+'-tasks')||'null'); if(t) TS={days:t.days||{},log:t.log||[],appts:t.appts||[]};}catch(e){}
+const saveTS=()=>{ if(tsCloud) return; try{localStorage.setItem(KEY+'-tasks',JSON.stringify(TS))}catch(e){} };
+const pad2=n=>String(n).padStart(2,'0');
+const dayKey=(d=new Date())=>`${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;
+const keyToU=k=>{const [y,m,d]=k.split('-').map(Number);return Date.UTC(y,m-1,d);};
+const meName=()=> (tsCloud&&Cloud.who) ? Cloud.who : 'أنا';
+const fmtTime=t=>new Date(t).toLocaleTimeString('ar-SY-u-nu-latn',{hour:'numeric',minute:'2-digit'});
+function whenTxt(t){const k=dayKey(new Date(t)), today=dayKey(), y=dayKey(new Date(Date.now()-864e5));
+  return (k===today?'اليوم':k===y?'أمس':new Date(t).toLocaleDateString('ar-SY-u-nu-latn',{day:'numeric',month:'short'}))+' '+fmtTime(t);}
+const SLOT_NAME=Object.fromEntries(SLOTS);
+const DAILY_FOOD={1:[['حصة ورقيات أو بقوليات','للفوليك: سبانخ، عدس، حمص، فول'],['كوب لبن أو حليب','للكالسيوم واليود']],
+  2:[['حصة حديد مع ليمون','لحم، أو عدس، أو سبانخ مع عصير برتقال'],['كوبان من الألبان','لبن، لبنة مبسترة، حليب'],['حفنة جوز أو حصة سمك','لأوميغا 3']],
+  3:[['حصة حديد','لحم، عدس، دبس، تمر'],['كوبان من الألبان','لبن، لبنة مبسترة، طحينة'],['ألياف مع كل وجبة','خضار، خبز أسمر، شوفان']]};
+const APPT_KIND={doc:'موعد طبيب',lab:'تحليل',us:'سونار',task:'مهمة'};
+function todayTasks(){
+  const out=[], S=schedule();
+  for(const [k,label] of SLOTS) for(const {p,n} of S[k]) out.push({id:`med_${k}_${p.id}`.replace(/[^A-Za-z0-9_]/g,''),grp:'الأدوية',t:`${p.name} × ${n}`,sub:label,med:true});
+  const m=curMonth(); const tri=m?MONTHS[m-1].tri:1;
+  DAILY_FOOD[tri].forEach(([t,sub],i)=>out.push({id:`food_${tri}_${i}`,grp:'الطعام',t,sub}));
+  if(m===9) out.push({id:'food_dates',grp:'الطعام',t:'6 تمرات',sub:'في الأسابيع الأخيرة، بعد سؤال طبيبتك'});
+  const today=dayKey();
+  TS.appts.filter(a=>!a.done&&a.date<=today).sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time))
+    .forEach(a=>out.push({id:'appt_'+a.id,appt:a,grp:'المواعيد',t:a.title,sub:(a.date<today?'فات موعده: ':'')+APPT_KIND[a.type||'task']+(a.time?' · '+a.time:'')+(a.note?' · '+a.note:''),late:a.date<today}));
+  return out;
+}
+function streak(){
+  let n=0; const d=new Date();
+  const ok=k=>{const x=TS.days[k]; if(!x||!x.medTotal) return false; return Object.keys(x.done||{}).filter(i=>i.startsWith('med_')).length>=x.medTotal;};
+  if(!ok(dayKey(d))) d.setDate(d.getDate()-1);
+  while(ok(dayKey(d))&&n<400){n++; d.setDate(d.getDate()-1);}
+  return n;
+}
+function renderToday(){
+  if(!$('tList')) return;
+  const today=dayKey(), day=TS.days[today]||{}, done=day.done||{}, water=day.water||0;
+  const tasks=todayTasks(); const nDone=tasks.filter(t=>t.appt?false:done[t.id]).length+(water>=8?1:0);
+  const total=tasks.filter(t=>!t.appt).length+1+tasks.filter(t=>t.appt).length;
+  const pct=total?Math.round(nDone/total*100):0;
+  const m=curMonth(), M=m?MONTHS[m-1]:null;
+  $('tHead').innerHTML=`<div class="fruit" aria-hidden="true">${M?M.fruit:'💗'}</div>
+    <div style="min-width:0;display:flex;flex-direction:column;gap:2px"><h2>${new Date().toLocaleDateString('ar-SY-u-nu-latn',{weekday:'long',day:'numeric',month:'long'})}</h2>
+    <span class="meta">${window._due&&!dueState.example?window._due.gaTxt+(M?' · ضيفنا الجديد '+M.size:''):'أدخلي تاريخ الحمل في «حملي» لتظهر مهامك حسب أسبوعك'}</span></div>
+    <div class="ring" style="--p:${pct}" aria-label="أُنجز ${nDone} من ${total}"><b>${nDone}/${total}</b></div>`;
+  $('tCount').textContent = nDone===total ? 'أحسنتِ، أنجزتِ كل مهام اليوم 💗' : `أُنجز ${nDone} من ${total}`;
+  let h='', g='';
+  for(const t of tasks){
+    if(t.grp!==g){ g=t.grp; h+=`<div class="tgroup">${g}</div>`; }
+    const d=t.appt?null:done[t.id];
+    h+=`<label class="task${d?' done':''}${t.late?' late':''}"><input type="checkbox" ${d?'checked':''} data-task="${t.id}" data-label="${esc(t.t)}"${t.med?' data-med="1"':''}${t.appt?` data-appt="${t.appt.id}"`:''}>
+      <span class="tt">${esc(t.t)}<small>${esc(t.sub||'')}</small></span><span class="by">${d?esc((d.by?d.by+' · ':'')+fmtTime(d.at)):''}</span></label>`;
+    if(t.grp==='الطعام' && !tasks.some((x,i)=>i>tasks.indexOf(t)&&x.grp==='الطعام')){
+      h+=`<div class="water"><span class="tt">الماء: <span class="num">${water}</span> من 8 أكواب</span><div class="cups" role="group" aria-label="أكواب الماء">${Array.from({length:8},(_,i)=>`<button type="button" class="cup${i<water?' full':''}" data-cup="${i+1}" aria-label="${i+1} أكواب"></button>`).join('')}</div></div>`;
+    }
+  }
+  $('tList').innerHTML=h;
+  // القادم: مواعيدك ومحطات الحمل خلال 3 أسابيع
+  const up=[], nowU=keyToU(today), L=lmpFrom();
+  TS.appts.filter(a=>!a.done&&a.date>today).forEach(a=>up.push({u:keyToU(a.date),t:a.title,sub:(a.time?a.time+' · ':'')+(a.note||''),kind:APPT_KIND[a.type||'task'],id:a.id}));
+  if(L!=null&&!dueState.example) MS.forEach(m=>{const a=L+m.w[0]*7*DAY; if(a>nowU&&a-nowU<=21*DAY) up.push({u:a,t:m.t,sub:m.d,kind:'محطة الحمل'});});
+  up.sort((a,b)=>a.u-b.u);
+  $('tUp').innerHTML= up.length? up.map(x=>{const dd=Math.round((x.u-nowU)/DAY);return `<div class="up"><div class="when"><b class="num">${dd}</b><small>${dd===1?'يوم':'أيام'}</small></div>
+      <div class="tt">${esc(x.t)}<span class="kind">${x.kind}</span><small>${esc(new Date(x.u).toLocaleDateString('ar-SY-u-nu-latn',{timeZone:'UTC',weekday:'long',day:'numeric',month:'long'}))}${x.sub?' · '+esc(x.sub):''}</small></div>
+      ${x.id?`<button class="del" type="button" data-delappt="${x.id}" aria-label="حذف">×</button>`:'<span></span>'}</div>`;}).join('')
+    : '<p class="empty">لا شيء خلال الأسابيع الثلاثة القادمة. أضيفي مواعيد الطبيب والتحاليل لتظهر هنا.</p>';
+  const s=streak(); $('tStreak').textContent = s? `الالتزام بالأدوية: ${s} ${s===1?'يوم':s<=10?'أيام':'يومًا'} متتالية` : '';
+  $('tLog').innerHTML = TS.log.length ? TS.log.slice(0,40).map(l=>`<li><span class="ic ${l.kind==='appt'?'appt':l.kind==='water'?'water':''}" aria-hidden="true">${l.kind==='appt'?'📅':l.kind==='water'?'💧':'✓'}</span><span><b>${esc(l.by||'')}</b> ${esc(l.text)}</span><time>${whenTxt(l.t)}</time></li>`).join('')
+    : '<li><span></span><span class="empty">ستظهر هنا كل مهمة تُنجز وكل موعد يُضاف، مع اسم من قام بها.</span><span></span></li>';
+  const left=total-nDone; $('todayBadge').hidden=!left; $('todayBadge').textContent=left;
+}
+function logLocal(text,kind){ TS.log.unshift({t:Date.now(),by:meName(),text,kind}); TS.log=TS.log.slice(0,100); }
+function medCount(){ return todayTasks().filter(t=>t.med).length; }
+async function toggleTask(id,label,on,isMed,apptId){
+  const today=dayKey();
+  if(apptId){ const a=TS.appts.find(x=>x.id===apptId); if(!a) return; a.done=on; a.doneBy=meName(); a.doneAt=Date.now();
+    if(tsCloud){ Cloud.saveAppt(a); if(on) Cloud.addLog('أنجز: '+a.title,'appt'); } else { if(on) logLocal('أنجز: '+a.title,'appt'); saveTS(); }
+    renderToday(); return; }
+  const day=TS.days[today]||(TS.days[today]={date:today,done:{}}); day.done=day.done||{};
+  if(on) day.done[id]={at:Date.now(),by:meName()}; else delete day.done[id];
+  day.medTotal=medCount();
+  if(tsCloud){ Cloud.markTask(today,id,on,{medTotal:day.medTotal}); if(on) Cloud.addLog((isMed?'أخذت ':'أنجزت ')+label,isMed?'med':'food'); }
+  else { if(on) logLocal((isMed?'أخذت ':'أنجزت ')+label,isMed?'med':'food'); saveTS(); }
+  renderToday();
+}
+function setWater(n){
+  const today=dayKey(), day=TS.days[today]||(TS.days[today]={date:today,done:{}});
+  const before=day.water||0; day.water=(n===before)?n-1:n;
+  if(tsCloud){ Cloud.setDay(today,{water:day.water}); if(before<8&&day.water>=8) Cloud.addLog('أكملت شرب 8 أكواب ماء','water'); }
+  else { if(before<8&&day.water>=8) logLocal('أكملت شرب 8 أكواب ماء','water'); saveTS(); }
+  renderToday();
+}
+$('tList').addEventListener('change',e=>{const c=e.target.closest('input[data-task]'); if(c) toggleTask(c.dataset.task,c.dataset.label,c.checked,!!c.dataset.med,c.dataset.appt);});
+$('tList').addEventListener('click',e=>{const c=e.target.closest('[data-cup]'); if(c) setWater(+c.dataset.cup);});
+$('apptAdd').onclick=()=>{const f=$('apptForm'); f.hidden=!f.hidden; if(!f.hidden){ $('a_date').value=dayKey(); $('a_title').focus(); }};
+$('apptCancel').onclick=()=>{$('apptForm').reset(); $('apptForm').hidden=true;};
+$('apptForm').addEventListener('submit',e=>{
+  e.preventDefault();
+  const a={id:'a'+Date.now().toString(36)+Math.random().toString(36).slice(2,6),title:$('a_title').value.trim().slice(0,80),type:$('a_type').value,date:$('a_date').value,time:$('a_time').value||'',note:$('a_note').value.trim().slice(0,120),done:false,by:meName(),at:Date.now()};
+  if(!a.title||!/^\d{4}-\d{2}-\d{2}$/.test(a.date)) return;
+  TS.appts.push(a);
+  const txt=`أضاف ${APPT_KIND[a.type]}: ${a.title} (${new Date(keyToU(a.date)).toLocaleDateString('ar-SY-u-nu-latn',{timeZone:'UTC',day:'numeric',month:'long'})})`;
+  if(tsCloud){ Cloud.saveAppt(a); Cloud.addLog(txt,'appt'); } else { logLocal(txt,'appt'); saveTS(); }
+  e.target.reset(); e.target.hidden=true; renderToday(); toast('حُفظ الموعد');
+});
+$('tUp').addEventListener('click',e=>{const b=e.target.closest('[data-delappt]'); if(!b) return; const id=b.dataset.delappt;
+  TS.appts=TS.appts.filter(a=>a.id!==id); if(tsCloud) Cloud.deleteAppt(id); else saveTS(); renderToday();});
+Cloud.on((what,x)=>{
+  if(what==='status'){ const was=tsCloud; tsCloud=Cloud.live&&['ok','offline'].includes(Cloud.status);
+    if(was&&!tsCloud){ try{const t=JSON.parse(localStorage.getItem(KEY+'-tasks')||'null'); TS=t?{days:t.days||{},log:t.log||[],appts:t.appts||[]}:{days:{},log:[],appts:[]};}catch(e){} apptsSeeded=false; renderToday(); }
+    return; }
+  if(what==='days'){ tsCloud=true; TS.days=x; renderToday(); }
+  if(what==='log'){ tsCloud=true; TS.log=x; renderToday(); }
+  if(what==='appts'){ tsCloud=true;
+    if(!apptsSeeded&&!x.fromCache){ apptsSeeded=true; let local=[]; try{local=(JSON.parse(localStorage.getItem(KEY+'-tasks')||'{}').appts)||[]}catch(e){}
+      const have=new Set(x.list.map(a=>a.id)); local.filter(a=>!have.has(a.id)).forEach(a=>{Cloud.saveAppt(a); x.list.push(a);}); }
+    TS.appts=x.list; renderToday(); }
+});
+setInterval(()=>{ if(!document.hidden) renderToday(); }, 60000);
+
+const TABS=['today','pregnancy','months','meds','tips'];
 function route(){
   const jm=(location.hash||'').match(/join=([0-9A-Z]{8})/i);
   if(jm){ history.replaceState(null,'',location.pathname+location.search); openAcct(jm[1].toUpperCase()); }
-  let t=jm?'pregnancy':(location.hash||'').slice(1); const toRes=t==='result'; if(toRes) t='meds'; if(!TABS.includes(t)) t='pregnancy';
+  let t=jm?'today':(location.hash||'').slice(1); const toRes=t==='result'; if(toRes) t='meds'; if(!TABS.includes(t)) t='today';
   TABS.forEach(k=>{$('v-'+k).hidden=k!==t;});
   document.querySelectorAll('.tab').forEach(a=>{if(a.dataset.tab===t) a.setAttribute('aria-current','page'); else a.removeAttribute('aria-current');});
   window.scrollTo(0,0);
@@ -1059,5 +1257,5 @@ function route(){
 }
 $('mstripGo').onclick=()=>$('resultTop').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'});
 window.addEventListener('hashchange',route);
-render(); route();
+render(); renderToday(); route();
 </script>

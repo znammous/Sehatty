@@ -164,6 +164,38 @@ const Cloud = (() => {
     return fb.fs.addDoc(famCol('apps', 'sehattyKids', 'hearts'), { t: fb.fs.serverTimestamp(), name: String(name || '').slice(0, 40) })
       .then(() => true).catch(() => false);
   }
+  // دفتر ذكرياتنا: كل أجهزة العائلة (ومنها أجهزة الأطفال) تقرأ الدفتر وتكتب فيه، وكل جهاز يعدّل ما كتبه فقط
+  // (وأولياء الأمر يحذفون أي ذكرى بالقاعدة العامة). الصورة في مستند منفصل في diaryImg حتى تبقى القائمة خفيفة.
+  const diaryOn = () => !!(fb && fid && user && (parent || status === 'kid'));
+  const dCol = n => famCol('apps', 'sehattyKids', n);
+  function diaryWatch(cb) {
+    if (!diaryOn()) return () => {};
+    return fb.fs.onSnapshot(dCol('diary'), snap => cb(snap.docs.map(d => ({ id: d.id, ...d.data() }))), () => cb(null));
+  }
+  // img: نص الصورة لحفظها، أو null لحذفها، أو undefined لإبقائها كما هي
+  function diarySave(id, e, img) {
+    if (!diaryOn()) return Promise.reject(new Error('unavailable'));
+    const b = fb.fs.writeBatch(fb.db), uid = user.uid;
+    const keep = img === undefined ? !!e.img : !!img;
+    b.set(fb.fs.doc(dCol('diary'), id), {
+      m: e.m, name: String(e.name || '').slice(0, 40), role: e.role, mood: e.mood || '', text: String(e.text || '').slice(0, 2000),
+      t: e.t || Date.now(), uid: e.uid && e.uid !== uid ? e.uid : uid, img: keep,
+    });
+    if (img) b.set(fb.fs.doc(dCol('diaryImg'), id), { d: img, uid });
+    else if (img === null) b.delete(fb.fs.doc(dCol('diaryImg'), id));
+    return b.commit();
+  }
+  function diaryDelete(id, hasImg) {
+    if (!diaryOn()) return Promise.reject(new Error('unavailable'));
+    const b = fb.fs.writeBatch(fb.db);
+    if (hasImg) b.delete(fb.fs.doc(dCol('diaryImg'), id));
+    b.delete(fb.fs.doc(dCol('diary'), id));
+    return b.commit();
+  }
+  function diaryImg(id) {
+    if (!diaryOn()) return Promise.resolve('');
+    return fb.fs.getDoc(fb.fs.doc(dCol('diaryImg'), id)).then(s => (s.exists() && s.data().d) || '').catch(() => '');
+  }
   // ولي الأمر يضيف جهازاً من داخل التطبيق: رمز من 8 أحرف بلا الأحرف المتشابهة، صالح لعشر دقائق.
   // kid = 'A|الاسم' لولي أمر، أو '' لجهاز طفل (نفس صيغة رموز تطبيقات العائلة)
   const ALPHABET = '23456789ABCDEFGHJKMNPQRSTUVWXYZ';
@@ -285,6 +317,9 @@ const Cloud = (() => {
 
   return {
     start, signIn, join, signOut, save, markTask, setDay, addLog, saveAppt, deleteAppt, publishKids, sendHeart, removeDevice, createCode, cancelCode,
+    diaryWatch, diarySave, diaryDelete, diaryImg,
+    get diaryOn() { return diaryOn(); },
+    get uid() { return user ? user.uid : ''; },
     get owner() { return !!(user && !user.isAnonymous); },
     get live() { return live(); },
     on: fn => listeners.push(fn),

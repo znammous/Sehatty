@@ -554,6 +554,7 @@ body.landing{padding-bottom:24px!important}
 .lkids-txt .ltag{align-self:flex-start}
 </style>
 <link rel="stylesheet" href="css/diary.css">
+<link rel="stylesheet" href="css/medlookup.css">
 
 <div class="bg" aria-hidden="true">
   <span class="sun-disc"></span>
@@ -877,6 +878,7 @@ body.landing{padding-bottom:24px!important}
         <details class="add" id="addBox">
           <summary>إضافة صنف غير موجود</summary>
           <form class="form" id="addForm">
+            <div class="full mlook"><label for="f_q">اكتبي الاسم العلمي والعيار، ونملأ الباقي</label><input id="f_q" type="search" autocomplete="off" enterkeyhint="search" placeholder="مثال: Ferrous fumarate 305 أو فوليك 5 أو metformin 500"><div class="msug" id="f_sug" hidden></div><p class="mnote" id="f_qnote" aria-live="polite"></p></div>
             <label class="full">اسم الصنف<input id="f_name" required placeholder="مثال: فيتامين حمل آخر"></label>
             <label>النوع<select id="f_cat">
               <option value="multi">فيتامينات متعددة</option>
@@ -884,6 +886,8 @@ body.landing{padding-bottom:24px!important}
               <option value="folic">حمض الفوليك</option>
               <option value="bone">كالسيوم / عظام</option>
               <option value="omega">أوميغا 3</option>
+              <option value="metformin">أدوية السكري</option>
+              <option value="rx">دواء آخر بوصفة</option>
               <option value="other">آخر</option>
             </select></label>
             <label>عدد الحبات يوميًا<input id="f_units" type="number" min="1" max="6" value="1"></label>
@@ -1042,6 +1046,7 @@ body.landing{padding-bottom:24px!important}
 <script src="js/vendor/qrcode.js"></script>
 <script src="js/cloud.js"></script>
 <script src="js/diary.js"></script>
+<script src="js/medlookup.js"></script>
 <script>
 const N = {
   iron:{l:'الحديد',u:'ملغ',rda:27,warn:45,max:120,note:'فوق 45 ملغ جرعة علاجية بإشراف الطبيب'},
@@ -1075,9 +1080,10 @@ const PURPOSE = {
   bone:{t:'الكالسيوم وفيتامين D',one:true,tip:'يكفي مصدر واحد للكالسيوم، مع الانتباه لما يأتي من الحليب والأجبان.'},
   omega:{t:'أوميغا 3',one:true,tip:'يكفي مصدر واحد يعطي 200 ملغ DHA على الأقل.'},
   metformin:{t:'أدوية السكري',one:false,tip:'دواء موصوف، لا يُستبدل ولا يُوقف إلا بقرار الطبيب.'},
+  rx:{t:'أدوية أخرى بوصفة',one:false,tip:'جرعة الدواء ووقته يحددهما الطبيب.'},
   other:{t:'أصناف أخرى',one:false}
 };
-const PORDER=['ironRx','folic','multi','bone','omega','metformin','other'];
+const PORDER=['ironRx','folic','multi','bone','omega','metformin','rx','other'];
 const BASE = [
   {id:'gyno',name:'Gyno-Ferro Sanol',sub:'حديد 100 + فوليك 0.5 + B12',form:'كبسولة',cat:'ironRx',def:1,c:{iron:100,folic:0.5,b12:2.5},why:'أعلى جرعة حديد. حديد ثنائي مرتبط بالغلايسين، وهو ألطف نسبيًا على المعدة. فيه B12.'},
   {id:'ferrofol',name:'Ferrofol-Z',sub:'حديد 47 + زنك 22.5 + فوليك 0.5',form:'كبسولة',cat:'ironRx',def:1,c:{iron:47,zinc:22.5,folic:0.5},why:'جرعة حديد أخف مع زنك. يناسب من تتعبها الجرعة العالية أو فقر الدم الخفيف.'},
@@ -1512,11 +1518,13 @@ $('copyBtn').onclick=()=>{
 $('addForm').addEventListener('submit',async e=>{
   e.preventDefault();
   const img=await readImg($('f_img').files[0]);
-  const c={}; ['iron','folic','calcium','vitD','zinc','magnesium','iodine','vitA','omega3'].forEach(k=>{const v=parseFloat($('f_'+k).value); if(v>0) c[k]=v;});
+  const FK=['iron','folic','calcium','vitD','zinc','magnesium','iodine','vitA','omega3'], ML=typeof MedLookup!=='undefined'&&MedLookup.pending();
+  const c={}; if(ML) for(const [k,v] of Object.entries(ML.c)) if(!FK.includes(k)) c[k]=v;
+  FK.forEach(k=>{const v=parseFloat($('f_'+k).value); if(v>0) c[k]=v;});
   const name=$('f_name').value.trim(); if(!name) return;
-  if(!Object.keys(c).length){toast('أدخلي مادة واحدة على الأقل');return;}
+  if(!Object.keys(c).length&&!['rx','metformin'].includes($('f_cat').value)){toast('أدخلي مادة واحدة على الأقل');return;}
   const id='c'+Date.now(), units=Math.max(1,Math.min(6,parseInt($('f_units').value)||1));
-  state.custom.push({id,name,sub:'صنف مضاف',form:'حبة',cat:$('f_cat').value,def:units,c,img,why:'صنف أضفتِه من علبته.'});
+  state.custom.push({id,name,sub:ML?ML.sub:'صنف مضاف',form:ML?ML.form:'حبة',cat:$('f_cat').value,def:units,c,img,why:ML?ML.why:'صنف أضفتِه من علبته.'});
   state.sel[id]=units; e.target.reset(); $('addBox').open=false; render(); toast('أُضيف الصنف');
 });
 /* ===== حساب العائلة والمزامنة ===== */

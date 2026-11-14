@@ -354,6 +354,11 @@ header.top{align-items:center}
 .duas b{display:block;font-size:13.5px;color:var(--muted)}
 .duas .ayah{font-size:20px}
 .duas small{color:var(--muted);font-size:12.5px}
+.confirm{text-align:center;align-items:center;width:min(100%,380px)}
+.confirm .cicon{width:64px;height:64px;border-radius:50%;background:var(--accent-soft);display:flex;align-items:center;justify-content:center;font-size:32px}
+.confirm h2{font-size:19px}
+.cbtns{justify-content:center;width:100%}
+.cbtns .btn{flex:1;padding:10px 14px;font-size:15px}
 textarea.copybox{width:100%;min-height:160px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink);font:inherit;font-size:13px;padding:8px}
 </style>
 
@@ -579,6 +584,14 @@ textarea.copybox{width:100%;min-height:160px;border:1px solid var(--line);border
   <figure class="welcome">
     <figcaption><span id="aTitle">حساب العائلة</span><button class="btn" id="aClose" type="button">إغلاق</button></figcaption>
     <div id="aBody" class="abody"></div>
+  </figure>
+</div>
+<div class="viewer" id="confirmDlg" hidden role="alertdialog" aria-modal="true" aria-labelledby="cTitle" aria-describedby="cText">
+  <figure class="welcome confirm">
+    <div class="cicon" id="cIcon" aria-hidden="true">💊</div>
+    <h2 id="cTitle"></h2>
+    <p id="cText" class="hint"></p>
+    <div class="btns cbtns"><button class="btn primary" id="cYes" type="button"></button><button class="btn" id="cNo" type="button">ليس بعد</button></div>
   </figure>
 </div>
 <div class="viewer" id="viewer" hidden role="dialog" aria-modal="true" aria-label="معاينة العلبة">
@@ -1250,7 +1263,25 @@ function setWater(n){
   else { if(before<8&&day.water>=8) logLocal('اكتمل شرب 8 أكواب ماء','water'); saveTS(); }
   renderToday();
 }
-$('tList').addEventListener('change',e=>{const c=e.target.closest('input[data-task]'); if(c) toggleTask(c.dataset.task,c.dataset.label,c.checked,!!c.dataset.med,c.dataset.appt);});
+// تأكيد قبل التعليم أو إلغائه، حتى لا تتحول المهمة إلى «تمّ» بلمسة غير مقصودة
+let pendingTask=null;
+function askTask(c){
+  const on=c.checked; c.checked=!on;   // لا يتغير شيء قبل التأكيد
+  const med=!!c.dataset.med, id=c.dataset.task, lbl=c.dataset.label;
+  const kind=med?'med':/^(dua|dhikr|quran)_/.test(id)?'dua':c.dataset.appt?'appt':'food';
+  pendingTask={id,lbl,on,med,appt:c.dataset.appt};
+  $('cIcon').textContent=on?({med:'💊',dua:'🤲',appt:'📅',food:'🥗'}[kind]):'↩️';
+  $('cTitle').textContent=on?(med?'هل تمّ تناول الدواء؟':kind==='dua'?'هل تمّ؟':kind==='appt'?'هل تمّ الموعد؟':'هل تمّت؟'):'إلغاء التعليم؟';
+  $('cText').textContent=on?lbl:`ستعود «${lbl}» إلى المهام غير المنجزة.`;
+  $('cYes').textContent=on?'نعم، تمّ':'نعم، ألغِ';
+  $('confirmDlg').hidden=false; $('cYes').focus();
+}
+function closeConfirm(){ $('confirmDlg').hidden=true; pendingTask=null; }
+$('cYes').onclick=()=>{ const t=pendingTask; closeConfirm(); if(t) toggleTask(t.id,t.lbl,t.on,t.med,t.appt); };
+$('cNo').onclick=closeConfirm;
+$('confirmDlg').addEventListener('click',e=>{ if(e.target.id==='confirmDlg') closeConfirm(); });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&!$('confirmDlg').hidden) closeConfirm(); });
+$('tList').addEventListener('change',e=>{const c=e.target.closest('input[data-task]'); if(c) askTask(c);});
 $('tList').addEventListener('click',e=>{const c=e.target.closest('[data-cup]'); if(c) setWater(+c.dataset.cup);});
 $('apptAdd').onclick=()=>{const f=$('apptForm'); f.hidden=!f.hidden; if(!f.hidden){ $('a_date').value=dayKey(); $('a_title').focus(); }};
 $('apptCancel').onclick=()=>{$('apptForm').reset(); $('apptForm').hidden=true;};

@@ -415,6 +415,8 @@ body.kidmode{padding-bottom:32px!important}
 .kdua small{color:var(--muted)}
 .kheart{border:0;border-radius:999px;padding:18px 24px;font-size:22px;font-weight:800;color:#fff;background:linear-gradient(180deg,var(--accent),var(--accent-dark));box-shadow:0 8px 0 var(--accent-dark),0 14px 24px rgba(204,58,118,.35);align-self:center;transition:transform .1s}
 .kheart:active{transform:translateY(5px);box-shadow:0 3px 0 var(--accent-dark)}
+.kheart:disabled{opacity:.6;cursor:default;transform:none;box-shadow:0 4px 0 var(--accent-dark)}
+.kdua .kdbtn{margin-top:6px}
 .ksent{text-align:center;font-weight:700;color:var(--accent);min-height:1.5em}
 .kexit{align-self:center}
 .fly{position:fixed;font-size:34px;pointer-events:none;z-index:30;animation:fly 1.6s ease-out forwards}
@@ -534,8 +536,10 @@ textarea.copybox{width:100%;min-height:160px;border:1px solid var(--line);border
     </div>
     <div class="kcard kdua">
       <h3>ادعُ لماما وللضيف الجديد 🤲</h3>
-      <span class="ayah">رَبِّ هَبْ لِي مِنَ الصَّالِحِينَ</span>
-      <small>سورة الصافات: 100</small>
+      <span class="ayah" id="kDuaTxt"></span>
+      <small id="kDuaSrc"></small>
+      <button class="kheart kdbtn" id="kDuaBtn" type="button">أرسل الدعاء لماما 🤲</button>
+      <p class="ksent" id="kDuaSent" aria-live="polite"></p>
     </div>
     <button class="kheart" id="kHeart" type="button">أرسل قلبًا لماما 💗</button>
     <p class="ksent" id="kSent" aria-live="polite"></p>
@@ -1521,7 +1525,7 @@ function renderToday(){
       ${x.id?`<button class="del" type="button" data-delappt="${x.id}" aria-label="حذف">×</button>`:'<span></span>'}</div>`;}).join('')
     : '<p class="empty">لا شيء خلال الأسابيع الثلاثة القادمة. أضيفي مواعيد الطبيب والتحاليل لتظهر هنا.</p>';
   const s=streak(); $('tStreak').textContent = s? `الالتزام بالأدوية: ${s} ${s===1?'يوم':s<=10?'أيام':'يومًا'} متتالية` : '';
-  const LOGALL=TS.log.concat((typeof HEARTS!=='undefined'?HEARTS:[]).map(h=>({t:h.t&&h.t.toMillis?h.t.toMillis():Date.now(),by:h.name||'طفل',text:'أرسل قلبًا لماما 💗',kind:'heart'}))).sort((a,b)=>b.t-a.t);
+  const LOGALL=TS.log.concat((typeof HEARTS!=='undefined'?HEARTS:[]).map(heartLog)).sort((a,b)=>b.t-a.t);
   $('tLog').innerHTML = LOGALL.length ? LOGALL.slice(0,40).map(l=>`<li><span class="ic ${l.kind==='appt'?'appt':l.kind==='water'?'water':l.kind==='dua'||l.kind==='heart'?'dua':''}" aria-hidden="true">${l.kind==='appt'?'📅':l.kind==='water'?'💧':l.kind==='dua'?'🤲':l.kind==='heart'?'💗':'✓'}</span><span>${l.by?`<b>${esc(l.by)}</b> · `:''}${esc(l.text)}</span><time>${whenTxt(l.t)}</time></li>`).join('')
     : '<li><span></span><span class="empty">ستظهر هنا كل مهمة تُنجز وكل موعد يُضاف، مع اسم من قام بها.</span><span></span></li>';
   const left=total-nDone; $('todayBadge').hidden=!left; $('todayBadge').textContent=left;
@@ -1607,6 +1611,25 @@ setInterval(()=>{ if(!document.hidden) renderToday(); }, 60000);
 $('duaList').innerHTML=DUAS.map(d=>`<div><b>${esc(d.n)}</b><span class="ayah">${d.t}</span><small>${esc(d.src)}</small></div>`).join('');
 /* ===== واجهة الأطفال ===== */
 // جهاز الطفل يقرأ موعد الولادة وحده من apps/sehattyKids، وجوال الوالدين يفتحها بزر «للأطفال».
+// دعاء الأطفال لماما: دعاء واحد كل يوم، ويُرسل مرة في اليوم إلى سجل ماما
+const KIDDUA=[
+  {t:'رَبِّ هَبْ لِي مِنَ الصَّالِحِينَ',s:'سورة الصافات: 100'},
+  {t:'اللهم احفظ ماما واحفظ ضيفنا الجديد',s:'دعاء من القلب 💗'},
+  {t:'رَبِّ هَبْ لِي مِن لَّدُنكَ ذُرِّيَّةً طَيِّبَةً إِنَّكَ سَمِيعُ الدُّعَاءِ',s:'سورة آل عمران: 38'},
+  {t:'اللهم قوِّ ماما ويسّر لها وأسعدها',s:'دعاء من القلب 💗'},
+  {t:'رَبَّنَا هَبْ لَنَا مِنْ أَزْوَاجِنَا وَذُرِّيَّاتِنَا قُرَّةَ أَعْيُنٍ',s:'سورة الفرقان: 74'},
+  {t:'اللهم اجعل ضيفنا الجديد سليمًا معافى صالحًا',s:'دعاء من القلب 💗'},
+  {t:'رَّبِّ ارْحَمْهُمَا كَمَا رَبَّيَانِي صَغِيرًا',s:'سورة الإسراء: 24'},
+  {t:'اللهم اشفِ ماما وأذهب عنها التعب',s:'دعاء من القلب 💗'},
+  {t:'رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً',s:'سورة البقرة: 201'},
+  {t:'اللهم اجمعنا بضيفنا الجديد على خير وفرح',s:'دعاء من القلب 💗'}
+];
+const duaToday=()=>dayIndex()%KIDDUA.length;
+function heartLog(h){
+  const t=h.t&&h.t.toMillis?h.t.toMillis():Date.now(), m=String(h.name||'').match(/^(.*)\|d(\d+)$/);
+  if(m){ const d=KIDDUA[+m[2]]; return {t,by:m[1]||'طفل',text:d?`دعا لماما: ${d.t} 🤲`:'دعا لماما 🤲',kind:'dua'}; }
+  return {t,by:h.name||'طفل',text:'أرسل قلبًا لماما 💗',kind:'heart'};
+}
 var kidsDoc=null, HEARTS=[], lastKidsLmp=null, kidFlag=false, heartAt=0;
 try{kidFlag=localStorage.getItem(KEY+'-kidmode')==='1'}catch(e){}
 const KIDFACT={1:'ضيفنا الجديد صغير جدًا الآن، أصغر من حبة سمسم! لكنه بدأ رحلته ليأتي إلينا.',2:'صار له قلب صغير ينبض بسرعة: دُق دُق دُق!',3:'صارت له يدان صغيرتان وأصابع، ويتحرك في بطن ماما.',4:'بدأ يسمع الأصوات. قل له: السلام عليكم يا ضيفنا!',5:'صار يركل ويتقلّب! ماما تشعر بحركته الآن.',6:'يسمع صوتك جيدًا. احكِ له قصة قصيرة قرب بطن ماما.',7:'صار يفتح عينيه ويغمضهما، ويعرف صوت ماما.',8:'ينام كثيرًا ويكبر بسرعة ليصير قويًا.',9:'صار جاهزًا تقريبًا! قريبًا نحمله ونلعب معه.'};
@@ -1680,6 +1703,10 @@ function renderKids(){
     $('kCups').innerHTML=Array.from({length:8},(_,i)=>`<i class="${i<water?'full':''}"></i>`).join('');
     $('kWaterTxt').textContent= water>=8 ? 'أحسنت ماما! شربت كل الأكواب الثمانية 🎉' : water===0 ? 'ماما لم تشرب الماء بعد اليوم. أحضِر لها كوبًا! 💧' : `ماما شربت ${water} من 8 أكواب. ذكّرها بكوب ماء! 💧`;
   }
+  const dq=KIDDUA[duaToday()]; $('kDuaTxt').textContent=dq.t; $('kDuaSrc').textContent=dq.s;
+  const sentDay=(()=>{try{return localStorage.getItem(KEY+'-kdua')}catch(e){return null}})()===dayKey();
+  $('kDuaBtn').disabled=sentDay; $('kDuaBtn').textContent= sentDay?'أرسلت دعاء اليوم ✓':'أرسل الدعاء لماما 🤲';
+  if(sentDay&&!$('kDuaSent').textContent) $('kDuaSent').textContent='وصل دعاؤك لماما، وغدًا دعاء جديد 🤲';
   const di=dayIndex(); $('kHelp').innerHTML=[0,1,2].map(i=>`<li>${KIDHELP[(di+i*3)%KIDHELP.length]}</li>`).join('');
 }
 function flyHearts(){
@@ -1697,6 +1724,15 @@ $('kHeart').onclick=async()=>{
   if(Cloud.live){ Cloud.sendHeart('الأطفال'); $('kSent').textContent='وصل قلبك لماما 💗'; return; }
   if(role()!=='kid'){ TS.log.unshift({t:Date.now(),by:'الأطفال',text:'أرسلوا قلبًا لماما 💗',kind:'heart'}); TS.log=TS.log.slice(0,100); saveTS(); }
   $('kSent').textContent='وصل قلبك لماما 💗';
+};
+$('kDuaBtn').onclick=async()=>{
+  const i=duaToday(), d=KIDDUA[i], st=Cloud.status, out=$('kDuaSent');
+  const mark=()=>{ try{localStorage.setItem(KEY+'-kdua',dayKey())}catch(e){} renderKids(); };
+  if(st==='kid'){ out.textContent='يُرسل…'; const ok=await Cloud.sendHeart(String(Cloud.who||'').slice(0,30)+'|d'+i);
+    if(!ok){ out.textContent='تعذّر الإرسال، جرّب حين يعود الإنترنت 🤲'; return; } }
+  else if(Cloud.live) Cloud.sendHeart('الأطفال|d'+i);
+  else if(role()!=='kid'){ TS.log.unshift({t:Date.now(),by:'الأطفال',text:`دعوا لماما: ${d.t} 🤲`,kind:'dua'}); TS.log=TS.log.slice(0,100); saveTS(); }
+  out.textContent='وصل دعاؤك لماما، وغدًا دعاء جديد 🤲'; mark();
 };
 $('kidBtn').onclick=()=>{ kidFlag=true; try{localStorage.setItem(KEY+'-kidmode','1')}catch(e){} applyKidMode(); };
 $('kExit').onclick=()=>{ if(kidFlag){ kidFlag=false; try{localStorage.removeItem(KEY+'-kidmode')}catch(e){} applyKidMode(); if(!isKidMode()){ route(); renderToday(); } } else openAcct(); };

@@ -430,6 +430,10 @@ body.kidmode .setbtn{display:none!important}
 .kcups i{width:32px;height:40px;border:3px solid var(--info);border-top-width:0;border-radius:0 0 11px 11px;background:#fff}
 .kcups i.full{background:linear-gradient(0deg,#9fd3f5 0 80%,#fff 80%)}
 .kwtxt{font-size:18px;font-weight:700}
+.kpills{display:flex;justify-content:center;gap:6px;flex-wrap:wrap}
+.kpills i{width:34px;height:18px;border-radius:9px;border:2px solid var(--accent);background:#fff;overflow:hidden;position:relative}
+.kpills i.done{background:linear-gradient(90deg,var(--accent) 0 50%,#fff 50%)}
+.kmeds.late{border-color:var(--warn)}
 textarea.copybox{width:100%;min-height:160px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink);font:inherit;font-size:13px;padding:8px}
 </style>
 <link rel="stylesheet" href="css/diary.css">
@@ -491,6 +495,12 @@ textarea.copybox{width:100%;min-height:160px;border:1px solid var(--line);border
       <p id="kNoTxt"></p>
       <button class="btn primary" id="kJoin" type="button">عندي رمز من ماما أو بابا</button>
     </div>
+    <div class="kcard kmeds" id="kMeds" hidden>
+      <h3>💊 دواء ماما اليوم</h3>
+      <div class="kpills" id="kPills" aria-hidden="true"></div>
+      <p class="kwtxt" id="kMedsTxt"></p>
+      <p class="hint" id="kMedsNext"></p>
+    </div>
     <div class="kcard kwater" id="kWater" hidden>
       <h3>💧 ماء ماما اليوم</h3>
       <div class="kcups" id="kCups" aria-hidden="true"></div>
@@ -503,7 +513,7 @@ textarea.copybox{width:100%;min-height:160px;border:1px solid var(--line);border
     <div class="kcard kdiary">
       <h3>دفتر ذكرياتنا 📔</h3>
       <p>اكتب لضيفنا الجديد ماذا تشعر هذا الشهر، والتقط صورة للذكرى.</p>
-      <button class="btn primary" id="kDiary" type="button">افتح الدفتر ✍️</button>
+      <button class="kheart kdbtn" id="kDiary" type="button">افتح الدفتر ✍️</button>
     </div>
     <div class="kcard kdua">
       <h3>ادعُ لماما وللضيف الجديد 🤲</h3>
@@ -1498,7 +1508,16 @@ function renderToday(){
   $('tLog').innerHTML = LOGALL.length ? LOGALL.slice(0,40).map(l=>`<li><span class="ic ${l.kind==='appt'?'appt':l.kind==='water'?'water':l.kind==='dua'||l.kind==='heart'?'dua':''}" aria-hidden="true">${l.kind==='appt'?'📅':l.kind==='water'?'💧':l.kind==='dua'?'🤲':l.kind==='heart'?'💗':'✓'}</span><span>${l.by?`<b>${esc(l.by)}</b> · `:''}${esc(l.text)}</span><time>${whenTxt(l.t)}</time></li>`).join('')
     : '<li><span></span><span class="empty">ستظهر هنا كل مهمة تُنجز وكل موعد يُضاف، مع اسم من قام بها.</span><span></span></li>';
   const left=total-nDone; $('todayBadge').hidden=!left; $('todayBadge').textContent=left;
+  // ملخص أدوية اليوم للأطفال: العدد والوقت التالي فقط، دون أسماء الأدوية
+  { const meds=tasks.filter(t=>t.med), mDone=meds.filter(t=>done[t.id]).length, nxt=meds.find(t=>!done[t.id]);
+    MEDSUM={medsDay:today,medsTotal:meds.length,medsDone:mDone,medsNext:nxt?nxt.sub:''}; publishMedsMaybe(); }
   if(document.body.classList.contains('kidmode')) try{renderKids()}catch(e){}
+}
+var MEDSUM=null, lastMedSig='';
+function publishMedsMaybe(){
+  if(!MEDSUM||typeof Cloud==='undefined'||!Cloud.live||!['ok','offline'].includes(Cloud.status)||dueState.example) return;
+  const sig=JSON.stringify(MEDSUM); if(sig===lastMedSig) return;
+  lastMedSig=sig; Cloud.publishKids(MEDSUM);
 }
 function logLocal(text,kind){ TS.log.unshift({t:Date.now(),by:meName(),text,kind}); TS.log=TS.log.slice(0,100); }
 function medCount(){ return todayTasks().filter(t=>t.med).length; }
@@ -1623,6 +1642,17 @@ function renderKids(){
     $('kPath').innerHTML=MONTHS.map(x=>`<i class="${x.m<M.m?'past':x.m===M.m?'now':''}">${x.m===M.m?M.fruit:x.m}</i>`).join('');
     $('kMeta').textContent=`نحن في الشهر ${M.m} من 9`;
     $('kBaby').style.transform=`scale(${(0.5+0.5*Math.min(ga/280,1)).toFixed(3)})`;
+  }
+  // أدوية ماما اليوم: العدد والوقت التالي فقط
+  let ms=null;
+  if(st==='kid'){ if(kidsDoc&&kidsDoc.medsTotal) ms=kidsDoc.medsDay===dayKey()?{t:kidsDoc.medsTotal,d:kidsDoc.medsDone||0,n:kidsDoc.medsNext||''}:{t:kidsDoc.medsTotal,d:0,n:''}; }
+  else if(adultAccess()&&MEDSUM&&MEDSUM.medsTotal){ ms={t:MEDSUM.medsTotal,d:MEDSUM.medsDone,n:MEDSUM.medsNext}; }
+  $('kMeds').hidden=!ms;
+  if(ms){
+    $('kPills').innerHTML=Array.from({length:ms.t},(_,i)=>`<i class="${i<ms.d?'done':''}"></i>`).join('');
+    const all=ms.d>=ms.t; $('kMeds').classList.toggle('late',!all&&ms.d===0);
+    $('kMedsTxt').textContent= all ? 'ماما أخذت كل أدويتها اليوم 👏' : ms.d===0 ? 'ماما لم تأخذ دواءها بعد اليوم. ذكّرها! 💊' : `ماما أخذت ${ms.d} من ${ms.t} حبات.`;
+    $('kMedsNext').textContent= !all&&ms.n ? `الحبة التالية: ${ms.n}. ذكّرها بلطف! 💗` : '';
   }
   // أكواب ماء ماما اليوم: من جوال الوالدين مباشرة، أو مما ينشرونه لأجهزة الأطفال
   let water=null;
